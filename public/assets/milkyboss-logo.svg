@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 72" fill="none">
+  <defs>
+    <linearGradient id="mbCarbon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2c3242" />
+      <stop offset="50%" stop-color="#171a23" />
+      <stop offset="100%" stop-color="#0b0d13" />
+    </linearGradient>
+
+    <linearGradient id="mbCrimson" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff3852" />
+      <stop offset="50%" stop-color="#c81e32" />
+      <stop offset="100%" stop-color="#8d1121" />
+    </linearGradient>
+  </defs>
+
+  <g transform="translate(6, 6)">
+    <rect x="18" y="18" width="28" height="28" rx="4" transform="rotate(45 32 32)" fill="#c81e32" opacity="0.3" />
+    <path d="M 32 8 L 8 32 L 32 56 Z" fill="url(#mbCarbon)" stroke="#3d4457" stroke-width="1" />
+    <path d="M 32 8 L 56 32 L 32 56 Z" fill="url(#mbCrimson)" stroke="#ff4a62" stroke-width="1" />
+    <path d="M 37 16 C 33 16 26.5 19 26.5 25 C 26.5 32 37.5 33 37.5 40 C 37.5 46.5 31 50 25.5 49" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  </g>
+
+  <text x="76" y="44" font-family="'Space Grotesk', 'Plus Jakarta Sans', sans-serif" font-size="26" font-weight="400" fill="#f1f5f9">
+    Milky
+  </text>
+  <text x="145" y="44" font-family="'Space Grotesk', 'Plus Jakarta Sans', sans-serif" font-size="26" font-weight="900" fill="#ffffff">
+    BOSS
+  </text>
+  <text x="228" y="44" font-family="'Space Grotesk', 'Plus Jakarta Sans', monospace" font-size="14" font-weight="700" letter-spacing="2" fill="#c81e32">
+    AGENCY
+  </text>
+</svg>

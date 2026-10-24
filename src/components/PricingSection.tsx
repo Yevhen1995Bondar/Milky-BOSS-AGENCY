@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { PRICING_PLANS, RETAINER_PLANS } from '../data/content';
+import { RETAINER_PLANS } from '../data/content';
 import { calculateProjectEstimate } from '../utils/pricing';
-import { Check, ArrowRight, Sparkles, Sliders, ShieldCheck } from 'lucide-react';
+import { Check, ArrowRight, Sliders, ShieldCheck } from 'lucide-react';
 import { PricingPlan } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface PricingSectionProps {
   onSelectPlan: (planName: string, estimateDetails?: string) => void;
 }
 
 export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) => {
+  const { pricingPlans, dict, language } = useLanguage();
+
   // Interactive estimator state
   const [selectedService, setSelectedService] = useState<'landingpage' | 'shopify' | 'corporate'>('shopify');
   const [features, setFeatures] = useState<string[]>(['crm_integration']);
@@ -33,15 +36,55 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
   const getServiceLabel = (type: string) => {
     switch (type) {
       case 'landingpage':
-        return 'Sprint Landingpage';
+        return language === 'de' ? 'Sprint Landingpage' : 'Sprint Landing Page';
       case 'shopify':
-        return 'Shopify E-Commerce Pro';
+        return language === 'de' ? 'Shopify E-Commerce Pro' : 'Shopify E-Commerce Pro';
       case 'corporate':
-        return 'KMU Corporate Website';
+        return language === 'de' ? 'KMU Corporate Website' : 'Corporate Web Platform';
       default:
-        return 'Projekt';
+        return 'Project';
     }
   };
+
+  const locale = language === 'de' ? 'de-DE' : 'en-US';
+
+  const addOnModules = [
+    {
+      id: 'meta_ads_setup',
+      label: language === 'de' ? 'Meta Ads (Instagram & FB) Erstellung & Audit' : 'Meta Ads (Instagram & FB) Setup & Audit',
+      cost: '+750 €',
+    },
+    {
+      id: 'social_audit_content',
+      label: language === 'de' ? 'Instagram & TikTok Audit + 30-Tage Content-Plan' : 'Instagram & TikTok Audit + 30-Day Content Plan',
+      cost: '+650 €',
+    },
+    {
+      id: 'strategic_swot_pestel',
+      label: language === 'de' ? 'Strategische Analyse (SWOT, PESTEL & Lebenszyklus)' : 'Strategic Analysis (SWOT, PESTEL & Lifecycle)',
+      cost: '+700 €',
+    },
+    {
+      id: 'crm_integration',
+      label: language === 'de' ? 'CRM-Integration (HubSpot / Klaviyo)' : 'CRM Integration (HubSpot / Klaviyo)',
+      cost: '+800 €',
+    },
+    {
+      id: 'google_ai_automation',
+      label: language === 'de' ? 'Google AI Studio Triage & Chatbot' : 'Google AI Studio Triage & Chatbot',
+      cost: '+950 €',
+    },
+    {
+      id: 'seo_bundle',
+      label: language === 'de' ? 'Lokales SEO Köln & NRW Bundle' : 'Local SEO & Core Vitals Optimization',
+      cost: '+600 €',
+    },
+    {
+      id: 'custom_checkout',
+      label: language === 'de' ? 'Custom Checkout & Upsell-Engine' : 'Custom Checkout & One-Click Upsell Engine',
+      cost: '+850 €',
+    },
+  ];
 
   return (
     <section id="pricing" className="py-24 bg-[#090a0f] relative overflow-hidden">
@@ -49,19 +92,19 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto">
           <div className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]">
-            Transparente Festpreise
+            {dict.pricing.tag}
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight">
-            Klare Tarife ohne versteckte Überraschungen.
+            {dict.pricing.heading}
           </h2>
           <p className="text-zinc-400 mt-3 text-base sm:text-lg">
-            Investitionssicherheit für Kölner Betriebe und wachsende E-Commerce Brands. Wählen Sie ein Standardpaket oder konfigurieren Sie Ihr individuelles Vorhaben im interaktiven Rechner.
+            {dict.pricing.subtext}
           </p>
         </div>
 
         {/* 3 Core Package Cards */}
         <div className="mt-14 grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
-          {PRICING_PLANS.map((plan: PricingPlan) => {
+          {pricingPlans.map((plan: PricingPlan) => {
             const isFeatured = !!plan.recommended;
             return (
               <div
@@ -75,7 +118,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
                 {isFeatured && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
                     <span className="text-[11px] font-bold uppercase tracking-wider bg-[#c81e32] text-white px-3 py-1 rounded-full shadow-sm">
-                      Beliebteste Wahl
+                      {dict.pricing.popular_badge}
                     </span>
                   </div>
                 )}
@@ -90,7 +133,9 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
                     <span className="text-4xl font-bold font-display text-white tabular-nums tracking-tight">
                       {plan.price}
                     </span>
-                    <span className="text-xs text-zinc-400">zzgl. MwSt.</span>
+                    <span className="text-xs text-zinc-400">
+                      {language === 'de' ? 'zzgl. MwSt.' : 'excl. VAT'}
+                    </span>
                   </div>
 
                   <div className="mt-2 text-xs font-mono text-zinc-400">{plan.deliveryTime}</div>
@@ -116,7 +161,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
                         : 'bg-white/5 hover:bg-white/10 text-white border border-white/10'
                     }`}
                   >
-                    <span>Dieses Paket wählen</span>
+                    <span>{dict.pricing.select_plan_btn}</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
@@ -134,7 +179,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
             >
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-wider text-[#c81e32]">
-                  Monatliche Betreuung
+                  {language === 'de' ? 'Monatliche Betreuung' : 'Monthly Retainer'}
                 </span>
                 <h4 className="text-base font-bold text-white font-display mt-0.5">{ret.name}</h4>
                 <p className="text-xs text-zinc-400 mt-1 max-w-md">{ret.description}</p>
@@ -145,7 +190,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
                   onClick={() => onSelectPlan(ret.name)}
                   className="text-xs px-3 py-1.5 rounded bg-white/5 hover:bg-[#c81e32] text-zinc-200 hover:text-white transition-colors cursor-pointer"
                 >
-                  Anfragen
+                  {language === 'de' ? 'Anfragen' : 'Inquire'}
                 </button>
               </div>
             </div>
@@ -161,16 +206,20 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
               </div>
               <div>
                 <h3 className="text-xl font-bold font-display text-white">
-                  Individueller Projekt-Kalkulator
+                  {language === 'de' ? 'Individueller Projekt-Kalkulator' : 'Custom Project Estimator'}
                 </h3>
                 <p className="text-xs text-zinc-400">
-                  Wählen Sie Modulbausteine aus und sehen Sie sofort das Investitionsvolumen.
+                  {language === 'de'
+                    ? 'Wählen Sie Modulbausteine aus und sehen Sie sofort das Investitionsvolumen.'
+                    : 'Select architectural modules and preview your exact project investment.'}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-2 text-xs text-zinc-400">
               <ShieldCheck className="w-4 h-4 text-emerald-400" />
-              <span>Verbindliche Festpreis-Garantie</span>
+              <span>
+                {language === 'de' ? 'Verbindliche Festpreis-Garantie' : 'Guaranteed Fixed Price Agreement'}
+              </span>
             </div>
           </div>
 
@@ -180,13 +229,13 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
               {/* Service Type Selection */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-zinc-300 block mb-3">
-                  1. Basis-Projekt wählen:
+                  {language === 'de' ? '1. Basis-Projekt wählen:' : '1. Choose Base Architecture:'}
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {[
-                    { id: 'landingpage', label: 'Landingpage', price: 'ab 1.850 €' },
-                    { id: 'shopify', label: 'Shopify Store', price: 'ab 3.900 €' },
-                    { id: 'corporate', label: 'KMU Website', price: 'ab 4.400 €' },
+                    { id: 'landingpage', label: language === 'de' ? 'Landingpage' : 'Landing Page', price: language === 'de' ? 'ab 1.850 €' : 'from €1,850' },
+                    { id: 'shopify', label: 'Shopify Store', price: language === 'de' ? 'ab 3.900 €' : 'from €3,900' },
+                    { id: 'corporate', label: language === 'de' ? 'KMU Website' : 'Corporate Site', price: language === 'de' ? 'ab 4.400 €' : 'from €4,400' },
                   ].map((s) => (
                     <button
                       key={s.id}
@@ -209,18 +258,10 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
               {/* Add-on Features */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-zinc-300 block mb-3">
-                  2. Spezifische Zusatzmodule:
+                  {language === 'de' ? '2. Spezifische Zusatzmodule:' : '2. Strategic Add-On Modules:'}
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {[
-                    { id: 'meta_ads_setup', label: 'Meta Ads (Instagram & FB) Erstellung & Audit', cost: '+750 €' },
-                    { id: 'social_audit_content', label: 'Instagram & TikTok Audit + 30-Tage Content-Plan', cost: '+650 €' },
-                    { id: 'strategic_swot_pestel', label: 'Strategische Analyse (SWOT, PESTEL & Lebenszyklus)', cost: '+700 €' },
-                    { id: 'crm_integration', label: 'CRM-Integration (HubSpot / Klaviyo)', cost: '+800 €' },
-                    { id: 'google_ai_automation', label: 'Google AI Studio Triage & Chatbot', cost: '+950 €' },
-                    { id: 'seo_bundle', label: 'Lokales SEO Köln & NRW Bundle', cost: '+600 €' },
-                    { id: 'custom_checkout', label: 'Custom Checkout & Upsell-Engine', cost: '+850 €' },
-                  ].map((feat) => {
+                  {addOnModules.map((feat) => {
                     const isChecked = features.includes(feat.id);
                     return (
                       <button
@@ -252,7 +293,7 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
               {/* Monthly Service Options */}
               <div>
                 <label className="text-xs font-bold uppercase tracking-wider text-zinc-300 block mb-3">
-                  3. Laufende Betreuung (optional):
+                  {language === 'de' ? '3. Laufende Betreuung (optional):' : '3. Ongoing Retainers (optional):'}
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
@@ -271,9 +312,13 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
                       >
                         {withAds && <Check className="w-3 h-3" />}
                       </div>
-                      <span className="text-xs font-medium text-zinc-200">Google &amp; Meta Ads Betreuung</span>
+                      <span className="text-xs font-medium text-zinc-200">
+                        {language === 'de' ? 'Google & Meta Ads Betreuung' : 'Google & Meta Ads Retainer'}
+                      </span>
                     </div>
-                    <span className="text-[11px] font-mono text-zinc-400 shrink-0">+850 €/Monat</span>
+                    <span className="text-[11px] font-mono text-zinc-400 shrink-0">
+                      {language === 'de' ? '+850 €/Monat' : '+€850/month'}
+                    </span>
                   </button>
 
                   <button
@@ -292,9 +337,13 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
                       >
                         {withMaintenance && <Check className="w-3 h-3" />}
                       </div>
-                      <span className="text-xs font-medium text-zinc-200">Technische Wartung &amp; Updates</span>
+                      <span className="text-xs font-medium text-zinc-200">
+                        {language === 'de' ? 'Technische Wartung & Updates' : 'Technical Maintenance & SLA'}
+                      </span>
                     </div>
-                    <span className="text-[11px] font-mono text-zinc-400 shrink-0">+390 €/Monat</span>
+                    <span className="text-[11px] font-mono text-zinc-400 shrink-0">
+                      {language === 'de' ? '+390 €/Monat' : '+€390/month'}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -303,48 +352,54 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
             {/* Right Summary Card */}
             <div className="lg:col-span-4 p-6 rounded-xl bg-[#0c0e15] border border-white/10 space-y-5">
               <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                Kalkulationsübersicht:
+                {language === 'de' ? 'Kalkulationsübersicht:' : 'Estimate Summary:'}
               </h4>
 
               <div className="space-y-3 text-xs">
                 <div className="flex justify-between pb-2 border-b border-white/5">
-                  <span className="text-zinc-400">Basis ({getServiceLabel(selectedService)}):</span>
-                  <span className="text-white font-mono">{estimate.basePrice.toLocaleString('de-DE')} €</span>
+                  <span className="text-zinc-400">{language === 'de' ? 'Basis' : 'Base'} ({getServiceLabel(selectedService)}):</span>
+                  <span className="text-white font-mono">{estimate.basePrice.toLocaleString(locale)} €</span>
                 </div>
                 <div className="flex justify-between pb-2 border-b border-white/5">
                   <span className="text-zinc-400">Module &amp; AI ({features.length}):</span>
-                  <span className="text-white font-mono">+{estimate.addOnPrice.toLocaleString('de-DE')} €</span>
+                  <span className="text-white font-mono">+{estimate.addOnPrice.toLocaleString(locale)} €</span>
                 </div>
                 {estimate.monthlyRetainer > 0 && (
                   <div className="flex justify-between pb-2 border-b border-white/5 text-emerald-400">
-                    <span>Laufende Betreuung:</span>
-                    <span className="font-mono">{estimate.monthlyRetainer.toLocaleString('de-DE')} € / Monat</span>
+                    <span>{language === 'de' ? 'Laufende Betreuung:' : 'Monthly Retainer:'}</span>
+                    <span className="font-mono">{estimate.monthlyRetainer.toLocaleString(locale)} € / {language === 'de' ? 'Monat' : 'month'}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-zinc-400">
-                  <span>Geschätzte Umsetzungszeit:</span>
-                  <span className="text-white font-mono">ca. {estimate.estimatedWeeks} Wochen</span>
+                  <span>{language === 'de' ? 'Geschätzte Umsetzungszeit:' : 'Estimated Timeline:'}</span>
+                  <span className="text-white font-mono">
+                    {language === 'de' ? `ca. ${estimate.estimatedWeeks} Wochen` : `approx. ${estimate.estimatedWeeks} weeks`}
+                  </span>
                 </div>
               </div>
 
               <div className="pt-4 border-t border-white/10">
-                <div className="text-xs text-zinc-400">Einmaliges Investitionsvolumen:</div>
-                <div className="text-3xl font-bold font-display text-white mt-1 tabular-nums">
-                  {estimate.totalOneTime.toLocaleString('de-DE')} €
+                <div className="text-xs text-zinc-400">
+                  {language === 'de' ? 'Einmaliges Investitionsvolumen:' : 'One-Time Project Investment:'}
                 </div>
-                <div className="text-[10px] text-zinc-400 mt-0.5">zzgl. gesetzlicher MwSt.</div>
+                <div className="text-3xl font-bold font-display text-white mt-1 tabular-nums">
+                  {estimate.totalOneTime.toLocaleString(locale)} €
+                </div>
+                <div className="text-[10px] text-zinc-400 mt-0.5">
+                  {language === 'de' ? 'zzgl. gesetzlicher MwSt.' : 'excl. applicable VAT'}
+                </div>
               </div>
 
               <button
                 onClick={() => {
-                  const summary = `${getServiceLabel(selectedService)} (Kalkulation: ca. ${estimate.totalOneTime} € einmalig${
-                    estimate.monthlyRetainer > 0 ? ` + ${estimate.monthlyRetainer} €/M` : ''
+                  const summary = `${getServiceLabel(selectedService)} (${language === 'de' ? 'Kalkulation' : 'Estimate'}: ca. ${estimate.totalOneTime} € ${language === 'de' ? 'einmalig' : 'one-time'}${
+                    estimate.monthlyRetainer > 0 ? ` + ${estimate.monthlyRetainer} €/${language === 'de' ? 'M' : 'mo'}` : ''
                   })`;
                   onSelectPlan(getServiceLabel(selectedService), summary);
                 }}
                 className="w-full py-3 px-4 rounded-md text-xs uppercase tracking-wider font-semibold text-white bg-[#c81e32] hover:bg-[#b01829] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#c81e32]/20"
               >
-                <span>In Anfrage übernehmen</span>
+                <span>{language === 'de' ? 'In Anfrage übernehmen' : 'Apply to Project Inquiry'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

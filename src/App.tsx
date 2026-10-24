@@ -13,6 +13,8 @@ import { PricingSection } from './components/PricingSection';
 import { FaqSection } from './components/FaqSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
+import { PagePreloader } from './components/PagePreloader';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 
 // Reusable viewport-triggered reveal container with Framer Motion
 interface SectionRevealProps {
@@ -36,7 +38,9 @@ const SectionReveal: React.FC<SectionRevealProps> = ({ children, id, delay = 0 }
   );
 };
 
-export default function App() {
+function MainApplication() {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const { language } = useLanguage();
   const [contactService, setContactService] = useState<string>('Shopify Onlineshop (Neubau oder Relaunch)');
   const [contactMessage, setContactMessage] = useState<string>('');
 
@@ -56,36 +60,61 @@ export default function App() {
 
   const handleSelectService = (serviceTitle: string) => {
     setContactService(serviceTitle);
-    setContactMessage(`Hallo Milky BOSS Team, ich interessiere mich für das Leistungsfeld "${serviceTitle}". Bitte kontaktieren Sie mich für ein unverbindliches Erstgespräch.`);
+    if (language === 'de') {
+      setContactMessage(`Hallo Milky BOSS Team, ich interessiere mich für das Leistungsfeld "${serviceTitle}". Bitte kontaktieren Sie mich für ein unverbindliches Erstgespräch.`);
+    } else {
+      setContactMessage(`Hello Milky BOSS Team, I am interested in your service offering "${serviceTitle}". Please contact me for an introductory consultation.`);
+    }
     scrollToContact();
   };
 
   const handleSelectPlan = (planName: string, estimateDetails?: string) => {
     setContactService(planName);
-    if (estimateDetails) {
-      setContactMessage(`Hallo Milky BOSS Team, ich habe den Projekt-Kalkulator genutzt:\n${estimateDetails}\n\nBitte prüfen Sie dieses Vorhaben.`);
+    if (language === 'de') {
+      if (estimateDetails) {
+        setContactMessage(`Hallo Milky BOSS Team, ich habe den Projekt-Kalkulator genutzt:\n${estimateDetails}\n\nBitte prüfen Sie dieses Vorhaben.`);
+      } else {
+        setContactMessage(`Hallo Milky BOSS Team, ich interessiere mich für das Paket "${planName}".`);
+      }
     } else {
-      setContactMessage(`Hallo Milky BOSS Team, ich interessiere mich für das Paket "${planName}".`);
+      if (estimateDetails) {
+        setContactMessage(`Hello Milky BOSS Team, I configured my project using the estimator:\n${estimateDetails}\n\nPlease review this scope.`);
+      } else {
+        setContactMessage(`Hello Milky BOSS Team, I am interested in the package "${planName}".`);
+      }
     }
     scrollToContact();
   };
 
   const handleApplyRoiCalculation = (estimatedRevenue: number) => {
-    setContactService('Conversion-Optimierung & E-Commerce');
-    setContactMessage(`Hallo Milky BOSS Team, laut Ihrem ROI-Simulator liegt unser jährliches Mehrumsatzpotenzial bei ca. ${estimatedRevenue.toLocaleString('de-DE')} €. Wir möchten dies gerne konkret besprechen.`);
+    setContactService(language === 'de' ? 'Conversion-Optimierung & E-Commerce' : 'Conversion Rate Optimization & E-Commerce');
+    const formattedRev = estimatedRevenue.toLocaleString(language === 'de' ? 'de-DE' : 'en-US');
+    if (language === 'de') {
+      setContactMessage(`Hallo Milky BOSS Team, laut Ihrem ROI-Simulator liegt unser jährliches Mehrumsatzpotenzial bei ca. ${formattedRev} €. Wir möchten dies gerne konkret besprechen.`);
+    } else {
+      setContactMessage(`Hello Milky BOSS Team, according to your ROI simulator our estimated annual revenue gain is approx. €${formattedRev}. We would like to discuss this concrete business case.`);
+    }
     scrollToContact();
   };
 
   return (
-    <div className="min-h-screen bg-[#090a0f] text-zinc-100 flex flex-col selection:bg-[#c81e32] selection:text-white">
+    <div className="min-h-screen bg-[#090a0f] text-zinc-100 flex flex-col selection:bg-[#c81e32] selection:text-white relative">
+      {/* 1. Initial Page Loading Animation */}
+      <PagePreloader onComplete={() => setIsLoaded(true)} />
+
       {/* Global Scroll Progress Indicator at very top */}
       <ScrollProgressBar />
 
-      {/* Top Navbar */}
+      {/* Top Navbar with Language Switcher */}
       <Navbar onOpenContact={scrollToContact} />
 
-      {/* Main Content Area with Framer Motion Section Reveals */}
-      <main className="flex-1">
+      {/* Main Content Area: Smooth entrance after preloader finishes */}
+      <motion.main
+        className="flex-1"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isLoaded ? 1 : 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+      >
         {/* 1. Hero */}
         <Hero
           onOpenContact={scrollToContact}
@@ -120,27 +149,35 @@ export default function App() {
           <WorkflowSection />
         </SectionReveal>
 
-        {/* 7. Pricing & Custom Budget Estimator */}
+        {/* 8. Pricing & Custom Budget Estimator */}
         <SectionReveal>
           <PricingSection onSelectPlan={handleSelectPlan} />
         </SectionReveal>
 
-        {/* 8. Frequently Asked Questions */}
+        {/* 9. Frequently Asked Questions */}
         <SectionReveal>
           <FaqSection />
         </SectionReveal>
 
-        {/* 9. Contact Form & Cologne Coordinates */}
+        {/* 10. Contact Form & Cologne Coordinates */}
         <SectionReveal>
           <ContactSection
             prefilledService={contactService}
             prefilledMessage={contactMessage}
           />
         </SectionReveal>
-      </main>
+      </motion.main>
 
       {/* Footer */}
       <Footer />
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <LanguageProvider>
+      <MainApplication />
+    </LanguageProvider>
   );
 }

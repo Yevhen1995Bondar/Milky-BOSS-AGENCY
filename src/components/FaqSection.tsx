@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { FAQS } from '../data/content';
 import { ChevronDown } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const FaqSection: React.FC = () => {
+  const { faqs, dict } = useLanguage();
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   const toggle = (idx: number) => {
@@ -15,18 +16,18 @@ export const FaqSection: React.FC = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto">
           <div className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]">
-            Häufige Fragen
+            {dict.faq.tag}
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight">
-            Transparente Antworten vor dem Projektstart.
+            {dict.faq.heading}
           </h2>
           <p className="text-zinc-400 mt-3 text-base">
-            Alles, was Sie über unsere Zusammenarbeit, Shopify-Entwicklung und CRM-Automatisierung wissen müssen.
+            {dict.faq.subtext}
           </p>
         </div>
 
         <div className="mt-12 space-y-4">
-          {FAQS.map((faq, idx) => {
+          {faqs.map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
               <div

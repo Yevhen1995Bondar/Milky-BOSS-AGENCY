@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, CheckCircle, ArrowRight, MapPin, Calendar, Clock, ExternalLink } from 'lucide-react';
+import { X, CheckCircle, ArrowRight, MapPin, Calendar, Clock } from 'lucide-react';
 import { ProjectCaseStudy } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ProjectModalProps {
   project: ProjectCaseStudy | null;
@@ -14,6 +15,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
   onClose,
   onRequestSimilar,
 }) => {
+  const { language } = useLanguage();
   if (!project) return null;
 
   return (
@@ -46,7 +48,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors"
+              className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
               aria-label="Modal schließen"
             >
               <X className="w-5 h-5" />
@@ -73,7 +75,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
                 <span>·</span>
                 <span className="flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5 text-zinc-400" />
-                  <span>Umsetzung: {project.duration}</span>
+                  <span>{language === 'de' ? `Umsetzung: ${project.duration}` : `Timeline: ${project.duration}`}</span>
                 </span>
               </div>
             </div>
@@ -94,7 +96,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
             {/* Quantified Results Grid */}
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">
-                Messbare Projektergebnisse:
+                {language === 'de' ? 'Messbare Projektergebnisse:' : 'Documented Results:'}
               </h4>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {project.results.map((res, i) => (
@@ -113,7 +115,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
               <div className="p-5 rounded-xl bg-red-950/15 border border-red-900/30">
                 <h5 className="text-sm font-bold text-red-200 flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#c81e32]" />
-                  Ausgangslage &amp; Herausforderung
+                  {language === 'de' ? 'Ausgangslage & Herausforderung' : 'Initial Problem & Challenge'}
                 </h5>
                 <p className="text-sm text-zinc-300 mt-2 leading-relaxed">
                   {project.challenge}
@@ -123,7 +125,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
               <div className="p-5 rounded-xl bg-emerald-950/15 border border-emerald-900/30">
                 <h5 className="text-sm font-bold text-emerald-300 flex items-center gap-2">
                   <CheckCircle className="w-4 h-4 text-emerald-400" />
-                  Milky BOSS Lösung &amp; Umsetzung
+                  {language === 'de' ? 'Milky BOSS Lösung & Umsetzung' : 'Milky BOSS Solution & Architecture'}
                 </h5>
                 <p className="text-sm text-zinc-300 mt-2 leading-relaxed">
                   {project.solution}
@@ -134,7 +136,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
             {/* Tech Stack */}
             <div>
               <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-2">
-                Eingesetzte Technologien &amp; Integrationen:
+                {language === 'de' ? 'Eingesetzte Technologien & Integrationen:' : 'Tech Stack & Integrations:'}
               </h4>
               <div className="flex flex-wrap gap-2">
                 {project.techStack.map((tech) => (
@@ -152,23 +154,25 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
           {/* Footer Action */}
           <div className="flex items-center justify-between px-6 py-4 border-t border-white/10 bg-[#0c0e15]">
             <span className="text-xs text-zinc-400 hidden sm:inline">
-              Möchten Sie ein vergleichbares Ergebnis für Ihr Unternehmen?
+              {language === 'de'
+                ? 'Möchten Sie ein vergleichbares Ergebnis für Ihr Unternehmen?'
+                : 'Looking for comparable results for your business?'}
             </span>
             <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
               <button
                 onClick={onClose}
-                className="px-4 py-2 text-xs font-medium text-zinc-300 hover:text-white"
+                className="px-4 py-2 text-xs font-medium text-zinc-300 hover:text-white cursor-pointer"
               >
-                Schließen
+                {language === 'de' ? 'Schließen' : 'Close'}
               </button>
               <button
                 onClick={() => {
                   onRequestSimilar(project.title);
                   onClose();
                 }}
-                className="inline-flex items-center gap-2 px-5 py-2.5 text-xs uppercase tracking-wider font-semibold text-white bg-[#c81e32] hover:bg-[#b01829] rounded-md transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-xs uppercase tracking-wider font-semibold text-white bg-[#c81e32] hover:bg-[#b01829] rounded-md transition-colors cursor-pointer"
               >
-                <span>Ähnliches Projekt anfragen</span>
+                <span>{language === 'de' ? 'Ähnliches Projekt anfragen' : 'Inquire Similar Project'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

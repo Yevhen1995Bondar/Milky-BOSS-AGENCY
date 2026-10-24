@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { CLIENT_TESTIMONIALS } from '../data/content';
 import { ChevronLeft, ChevronRight, Star, Quote, Pause, Play, TrendingUp } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const TestimonialsSection: React.FC = () => {
+  const { testimonials, dict, language } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [direction, setDirection] = useState<number>(1);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const total = CLIENT_TESTIMONIALS.length;
+  const total = testimonials.length;
 
   const nextSlide = () => {
     setDirection(1);
@@ -40,7 +41,7 @@ export const TestimonialsSection: React.FC = () => {
     };
   }, [isPaused, total, currentIndex]);
 
-  const current = CLIENT_TESTIMONIALS[currentIndex];
+  const current = testimonials[currentIndex] || testimonials[0];
 
   const variants = {
     enter: (dir: number) => ({
@@ -79,13 +80,13 @@ export const TestimonialsSection: React.FC = () => {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto">
           <div className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]">
-            Kundenstimmen &amp; Erfolgsberichte
+            {dict.testimonials.tag}
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight">
-            Was Kölner Unternehmer sagen.
+            {dict.testimonials.heading}
           </h2>
           <p className="text-zinc-400 mt-3 text-base">
-            Echte Erfahrungen unserer Partner aus den Bereichen E-Commerce, Social Media Marketing und CRM-Automatisierung.
+            {dict.testimonials.subtext}
           </p>
         </div>
 
@@ -108,7 +109,7 @@ export const TestimonialsSection: React.FC = () => {
               {/* Metric tag */}
               <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold font-mono">
                 <TrendingUp className="w-3.5 h-3.5" />
-                <span>{current.metric}</span>
+                <span>{current.metricsResult}</span>
               </div>
             </div>
 
@@ -116,7 +117,7 @@ export const TestimonialsSection: React.FC = () => {
             <div className="py-6 flex-1 flex items-center">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
-                  key={current.id}
+                  key={current.id + language}
                   custom={direction}
                   variants={variants}
                   initial="enter"
@@ -131,7 +132,7 @@ export const TestimonialsSection: React.FC = () => {
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-white/5">
                     <div>
                       <div className="text-base font-bold text-white font-display">
-                        {current.author}
+                        {current.name}
                       </div>
                       <div className="text-xs text-zinc-400">
                         {current.role} · <span className="text-zinc-200">{current.company}</span>
@@ -139,7 +140,7 @@ export const TestimonialsSection: React.FC = () => {
                     </div>
 
                     <div className="text-xs font-mono text-[#c81e32] font-semibold bg-[#c81e32]/10 px-2.5 py-1 rounded-md self-start sm:self-auto">
-                      {current.service}
+                      {current.projectType}
                     </div>
                   </div>
                 </motion.div>
@@ -150,7 +151,7 @@ export const TestimonialsSection: React.FC = () => {
             <div className="pt-6 border-t border-white/10 flex items-center justify-between">
               {/* Pagination Dots */}
               <div className="flex items-center gap-2">
-                {CLIENT_TESTIMONIALS.map((t, idx) => (
+                {testimonials.map((t, idx) => (
                   <button
                     key={t.id}
                     onClick={() => goToSlide(idx)}
@@ -159,7 +160,7 @@ export const TestimonialsSection: React.FC = () => {
                         ? 'w-7 bg-[#c81e32]'
                         : 'w-2 bg-white/20 hover:bg-white/40'
                     }`}
-                    aria-label={`Gehe zu Referenz ${idx + 1}`}
+                    aria-label={`Go to slide ${idx + 1}`}
                   />
                 ))}
               </div>
@@ -169,8 +170,8 @@ export const TestimonialsSection: React.FC = () => {
                 <button
                   onClick={() => setIsPaused(!isPaused)}
                   className="p-2 text-zinc-400 hover:text-white rounded-lg hover:bg-white/5 transition-colors cursor-pointer mr-1"
-                  aria-label={isPaused ? 'Auto-Play starten' : 'Auto-Play pausieren'}
-                  title={isPaused ? 'Auto-Play starten' : 'Auto-Play pausieren'}
+                  aria-label={isPaused ? dict.testimonials.autoplay : dict.testimonials.paused}
+                  title={isPaused ? dict.testimonials.autoplay : dict.testimonials.paused}
                 >
                   {isPaused ? <Play className="w-4 h-4 text-[#c81e32]" /> : <Pause className="w-4 h-4" />}
                 </button>
@@ -178,7 +179,7 @@ export const TestimonialsSection: React.FC = () => {
                 <button
                   onClick={prevSlide}
                   className="p-2 text-zinc-300 hover:text-white rounded-lg border border-white/10 hover:border-white/20 hover:bg-white/5 transition-colors cursor-pointer"
-                  aria-label="Vorherige Referenz"
+                  aria-label="Previous"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
@@ -186,7 +187,7 @@ export const TestimonialsSection: React.FC = () => {
                 <button
                   onClick={nextSlide}
                   className="p-2 text-zinc-300 hover:text-white rounded-lg border border-white/10 hover:border-white/20 hover:bg-white/5 transition-colors cursor-pointer"
-                  aria-label="Nächste Referenz"
+                  aria-label="Next"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>

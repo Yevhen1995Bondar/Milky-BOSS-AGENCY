@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { CONTACT_EMAIL, CONTACT_PHONE, LOCATION_CITY } from '../data/content';
-import { ArrowUpRight, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { MilkyBossLogo } from './MilkyBossLogo';
+import { useLanguage } from '../context/LanguageContext';
 
 export const Footer: React.FC = () => {
   const [legalModal, setLegalModal] = useState<'imprint' | 'privacy' | null>(null);
+  const { dict, language } = useLanguage();
+  const f = dict.footer;
 
   return (
     <footer className="bg-[#07080c] border-t border-white/10 text-zinc-400 text-xs">
@@ -16,17 +19,17 @@ export const Footer: React.FC = () => {
               <MilkyBossLogo size="sm" />
             </a>
             <p className="text-zinc-400 max-w-sm leading-relaxed">
-              Spezialisierte Webentwicklung &amp; Performance-Marketing in Köln. Wir bauen verkaufsstarke Shopify-Shops, Landingpages und KI-gestützte CRM-Systeme für den deutschen Mittelstand.
+              {f.desc}
             </p>
             <div className="text-zinc-400">
-              Standort: MediaPark / Ehrenfeld, 50672 {LOCATION_CITY}
+              {language === 'de' ? 'Standort:' : 'Location:'} MediaPark / Ehrenfeld, 50672 {LOCATION_CITY}
             </div>
           </div>
 
           {/* Quick Links */}
           <div className="md:col-span-3 space-y-3">
             <div className="text-white font-semibold uppercase tracking-wider text-[11px]">
-              Dienstleistungen
+              {f.services_title}
             </div>
             <ul className="space-y-2">
               <li>
@@ -60,23 +63,25 @@ export const Footer: React.FC = () => {
           {/* Navigation & Contact */}
           <div className="md:col-span-4 space-y-3">
             <div className="text-white font-semibold uppercase tracking-wider text-[11px]">
-              Direkter Kontakt
+              {language === 'de' ? 'Direkter Kontakt' : 'Direct Contact'}
             </div>
             <div className="space-y-2 text-zinc-300">
               <div>
-                E-Mail:{' '}
+                {language === 'de' ? 'E-Mail:' : 'Email:'}{' '}
                 <a href={`mailto:${CONTACT_EMAIL}`} className="text-white hover:underline">
                   {CONTACT_EMAIL}
                 </a>
               </div>
               <div>
-                Telefon:{' '}
+                {language === 'de' ? 'Telefon:' : 'Phone:'}{' '}
                 <a href={`tel:${CONTACT_PHONE.replace(/\s+/g, '')}`} className="text-white hover:underline">
                   {CONTACT_PHONE}
                 </a>
               </div>
               <div className="text-zinc-400 text-[11px] pt-1">
-                Kostenlose Erstberatung (ca. 20 Min. per Telefon oder Google Meet)
+                {language === 'de'
+                  ? 'Kostenlose Erstberatung (ca. 20 Min. per Telefon oder Google Meet)'
+                  : 'Free discovery consultation (approx. 20 min via Phone or Google Meet)'}
               </div>
             </div>
           </div>
@@ -85,23 +90,23 @@ export const Footer: React.FC = () => {
         {/* Bottom Legal Bar */}
         <div className="mt-12 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-zinc-400 text-[11px]">
-            &copy; {new Date().getFullYear()} Milky BOSS Agency. Alle Rechte vorbehalten. Entwickelt in Köln.
+            &copy; {new Date().getFullYear()} Milky BOSS Agency. {f.rights}
           </div>
           <div className="flex items-center gap-6 text-[11px]">
             <button
               onClick={() => setLegalModal('imprint')}
               className="hover:text-white transition-colors cursor-pointer"
             >
-              Impressum
+              {f.imprint}
             </button>
             <button
               onClick={() => setLegalModal('privacy')}
               className="hover:text-white transition-colors cursor-pointer"
             >
-              Datenschutz
+              {f.privacy}
             </button>
             <a href="#services" className="hover:text-white transition-colors">
-              Nach oben ↑
+              {language === 'de' ? 'Nach oben ↑' : 'Back to top ↑'}
             </a>
           </div>
         </div>
@@ -113,11 +118,11 @@ export const Footer: React.FC = () => {
           <div className="relative w-full max-w-xl bg-[#11141c] border border-white/10 rounded-2xl p-6 sm:p-8 max-h-[80vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-white/10">
               <h3 className="text-lg font-bold text-white font-display">
-                {legalModal === 'imprint' ? 'Impressum (§ 5 DDG)' : 'Datenschutzerklärung'}
+                {legalModal === 'imprint' ? (language === 'de' ? 'Impressum (§ 5 DDG)' : 'Imprint / Legal Notice') : (language === 'de' ? 'Datenschutzerklärung' : 'Privacy Policy')}
               </h3>
               <button
                 onClick={() => setLegalModal(null)}
-                className="p-1 text-zinc-400 hover:text-white"
+                className="p-1 text-zinc-400 hover:text-white cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -127,51 +132,39 @@ export const Footer: React.FC = () => {
               {legalModal === 'imprint' ? (
                 <>
                   <p>
-                    <strong>Angaben gemäß § 5 DDG:</strong><br />
+                    <strong>{language === 'de' ? 'Angaben gemäß § 5 DDG:' : 'Information according to German Telemedia Act (§ 5 DDG):'}</strong><br />
                     Milky BOSS Agency<br />
                     Webentwicklung &amp; E-Commerce Dienstleistungen<br />
                     MediaPark / Ehrenfeld<br />
                     50672 Köln, Deutschland
                   </p>
                   <p>
-                    <strong>Kontakt:</strong><br />
+                    <strong>{language === 'de' ? 'Kontakt:' : 'Contact:'}</strong><br />
                     Telefon: {CONTACT_PHONE}<br />
                     E-Mail: {CONTACT_EMAIL}
                   </p>
                   <p>
-                    <strong>Umsatzsteuer:</strong><br />
-                    Umsatzsteuer-Identifikationsnummer gemäß § 27 a UStG: DE349812745
-                  </p>
-                  <p>
-                    <strong>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV:</strong><br />
-                    Milky BOSS Agency, MediaPark, 50672 Köln
+                    <strong>Verantwortlich für den Inhalt:</strong><br />
+                    Milky BOSS Agency Lead Developer &amp; Marketing Strategist<br />
+                    Köln, Deutschland
                   </p>
                 </>
               ) : (
                 <>
                   <p>
-                    <strong>1. Datenschutz auf einen Blick</strong><br />
-                    Der Schutz Ihrer persönlichen Daten ist uns ein wichtiges Anliegen. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend den gesetzlichen Datenschutzvorschriften (DSGVO) sowie dieser Datenschutzerklärung.
+                    <strong>Datenschutz auf einen Blick:</strong><br />
+                    Wir nehmen den Schutz Ihrer persönlichen Daten sehr ernst. Personenbezogene Daten, die Sie über das Kontaktformular übermitteln, werden vertraulich und entsprechend der gesetzlichen Datenschutzvorschriften (DSGVO) sowie dieser Datenschutzerklärung behandelt.
                   </p>
                   <p>
-                    <strong>2. Datenerfassung auf dieser Website</strong><br />
-                    Die Datenerfassung auf dieser Website erfolgt ausschließlich zur Bearbeitung von Projektanfragen über das Kontaktformular. Eine Weitergabe an unberechtigte Dritte findet zu keinem Zeitpunkt statt.
+                    <strong>Datenerfassung auf dieser Website:</strong><br />
+                    Die Datenerfassung auf dieser Website erfolgt durch den Websitebetreiber. Ihre Daten werden zum Zweck der Kontaktaufnahme und Angebotserstellung verarbeitet und niemals unbefugt an Dritte weitergegeben.
                   </p>
                   <p>
-                    <strong>3. Ihre Rechte</strong><br />
+                    <strong>Ihre Rechte:</strong><br />
                     Sie haben jederzeit das Recht auf unentgeltliche Auskunft über Ihre gespeicherten personenbezogenen Daten, deren Herkunft und Empfänger und den Zweck der Datenverarbeitung sowie ein Recht auf Berichtigung oder Löschung dieser Daten.
                   </p>
                 </>
               )}
-            </div>
-
-            <div className="mt-6 pt-4 border-t border-white/10 text-right">
-              <button
-                onClick={() => setLegalModal(null)}
-                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-md text-xs font-semibold cursor-pointer"
-              >
-                Schließen
-              </button>
             </div>
           </div>
         </div>

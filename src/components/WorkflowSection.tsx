@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { Bot, ShoppingBag, Database, Zap, ArrowRight, CheckCircle2, Cpu } from 'lucide-react';
+import { Bot, ShoppingBag, Database, Zap, CheckCircle2, Cpu } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export const WorkflowSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'crm' | 'shopify' | 'ai'>('crm');
+  const { language, dict } = useLanguage();
+  const w = dict.workflow;
 
   return (
     <section id="automation" className="py-24 bg-[#090a0f] relative overflow-hidden">
@@ -13,13 +15,13 @@ export const WorkflowSection: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-3xl">
           <div className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]">
-            System-Architektur &amp; Effizienz
+            {w.tag}
           </div>
           <h2 className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight">
-            Shopify &amp; Google AI Studio: Die smarte Symbiose.
+            {w.heading}
           </h2>
           <p className="text-zinc-400 mt-3 text-base sm:text-lg leading-relaxed">
-            Verbinden Sie modernen E-Commerce mit künstlicher Intelligenz. Wir integrieren Google AI Studio direkt in Ihre Vertriebs- und CRM-Prozesse, um Bestellungen, Kundenanfragen und Follow-ups vollautomatisch abzuwickeln.
+            {w.subtext}
           </p>
         </div>
 
@@ -36,7 +38,7 @@ export const WorkflowSection: React.FC = () => {
               }`}
             >
               <Database className="w-4 h-4" />
-              <span>CRM &amp; Lead-Pipeline</span>
+              <span>{language === 'de' ? 'CRM & Lead-Pipeline' : 'CRM & Lead Pipeline'}</span>
             </button>
 
             <button
@@ -48,7 +50,7 @@ export const WorkflowSection: React.FC = () => {
               }`}
             >
               <ShoppingBag className="w-4 h-4" />
-              <span>Shopify Bestell-Automation</span>
+              <span>{language === 'de' ? 'Shopify Bestell-Automation' : 'Shopify Order Automation'}</span>
             </button>
 
             <button
@@ -60,7 +62,7 @@ export const WorkflowSection: React.FC = () => {
               }`}
             >
               <Bot className="w-4 h-4" />
-              <span>Google AI Studio Triage</span>
+              <span>{language === 'de' ? 'Google AI Studio Triage' : 'Google AI Studio Triage'}</span>
             </button>
           </div>
 
@@ -70,19 +72,21 @@ export const WorkflowSection: React.FC = () => {
             <div className="p-6 rounded-xl bg-[#141824] border border-white/5 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono px-2 py-0.5 rounded bg-white/10 text-zinc-300">
-                  Schritt 01
+                  {language === 'de' ? 'Schritt 01' : 'Step 01'}
                 </span>
                 <Zap className="w-4 h-4 text-[#c81e32]" />
               </div>
               <h4 className="text-lg font-bold text-white font-display">
-                Erfassung &amp; Routing
+                {language === 'de' ? 'Erfassung & Routing' : 'Capture & Ingestion'}
               </h4>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Kunde bestellt auf Shopify oder füllt Anfrageformular auf der Landingpage aus. Daten werden validiert und in Echtzeit per Webhook weitergeleitet.
+                {language === 'de'
+                  ? 'Kunde bestellt auf Shopify oder füllt Anfrageformular auf der Landingpage aus. Daten werden validiert und in Echtzeit per Webhook weitergeleitet.'
+                  : 'Client places an order on Shopify or submits a lead inquiry. Submissions are instantly validated and streamed via low-latency webhooks.'}
               </p>
               <div className="pt-2 text-xs font-mono text-zinc-300 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Reaktionszeit &lt; 200ms</span>
+                <span>{language === 'de' ? 'Reaktionszeit < 200ms' : 'Latency < 200ms'}</span>
               </div>
             </div>
 
@@ -90,19 +94,21 @@ export const WorkflowSection: React.FC = () => {
             <div className="p-6 rounded-xl bg-[#141824] border border-[#c81e32]/30 space-y-4 relative">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#c81e32]/20 text-[#c81e32] font-semibold">
-                  Schritt 02 · AI Core
+                  {language === 'de' ? 'Schritt 02 · AI Core' : 'Step 02 · AI Core'}
                 </span>
                 <Cpu className="w-4 h-4 text-[#c81e32]" />
               </div>
               <h4 className="text-lg font-bold text-white font-display">
-                Google AI Studio Analyse
+                {language === 'de' ? 'Google AI Studio Analyse' : 'Google AI Studio Evaluation'}
               </h4>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Das Modell klassifiziert Anfragen nach Dringlichkeit, Budget und Produktkategorie. Es generiert personalisierte Antwortentwürfe oder Rabatt-Anreize für den Checkout.
+                {language === 'de'
+                  ? 'Das Modell klassifiziert Anfragen nach Dringlichkeit, Budget und Produktkategorie. Es generiert personalisierte Antwortentwürfe oder Rabatt-Anreize für den Checkout.'
+                  : 'Gemini models evaluate intent, purchase authority, and urgent objections. It generates contextual follow-ups or personalized checkout incentives.'}
               </p>
               <div className="pt-2 text-xs font-mono text-[#c81e32] flex items-center gap-1.5">
                 <Bot className="w-3.5 h-3.5" />
-                <span>Intelligente Vor-Qualifizierung</span>
+                <span>{language === 'de' ? 'Intelligente Vor-Qualifizierung' : 'Smart Pre-Qualification'}</span>
               </div>
             </div>
 
@@ -110,19 +116,21 @@ export const WorkflowSection: React.FC = () => {
             <div className="p-6 rounded-xl bg-[#141824] border border-white/5 space-y-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono px-2 py-0.5 rounded bg-white/10 text-zinc-300">
-                  Schritt 03
+                  {language === 'de' ? 'Schritt 03' : 'Step 03'}
                 </span>
                 <Database className="w-4 h-4 text-emerald-400" />
               </div>
               <h4 className="text-lg font-bold text-white font-display">
-                CRM &amp; Fulfillment Sync
+                {language === 'de' ? 'CRM & Fulfillment Sync' : 'CRM & Warehouse Sync'}
               </h4>
               <p className="text-xs text-zinc-400 leading-relaxed">
-                Automatische Anlage des Kontakts in HubSpot, Klaviyo oder Pipedrive. Bestätigungen per WhatsApp oder SMS und direkte Übergabe an das Versandlager.
+                {language === 'de'
+                  ? 'Automatische Anlage des Kontakts in HubSpot, Klaviyo oder Pipedrive. Bestätigungen per WhatsApp oder SMS und direkte Übergabe an das Versandlager.'
+                  : 'Seamless record creation in HubSpot, Klaviyo, or Pipedrive. Instant notifications dispatched and automated transmission to fulfillment systems.'}
               </p>
               <div className="pt-2 text-xs font-mono text-zinc-300 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>0 Minuten manueller Aufwand</span>
+                <span>{language === 'de' ? '0 Minuten manueller Aufwand' : 'Zero manual repetitive labor'}</span>
               </div>
             </div>
           </div>
@@ -134,7 +142,9 @@ export const WorkflowSection: React.FC = () => {
                 <Bot className="w-5 h-5" />
               </div>
               <div className="text-sm">
-                <span className="font-semibold text-white">Unterstützte Systeme: </span>
+                <span className="font-semibold text-white">
+                  {language === 'de' ? 'Unterstützte Systeme: ' : 'Compatible Ecosystems: '}
+                </span>
                 <span className="text-zinc-400">Shopify Flow, Google AI Studio, HubSpot, Klaviyo, Pipedrive, Zapier &amp; Make.</span>
               </div>
             </div>
@@ -142,7 +152,7 @@ export const WorkflowSection: React.FC = () => {
               href="#pricing"
               className="text-xs font-semibold text-zinc-200 hover:text-white underline underline-offset-4 shrink-0"
             >
-              Zu den Tarifen &amp; Kosten →
+              {language === 'de' ? 'Zu den Tarifen & Kosten →' : 'View Pricing & Packages →'}
             </a>
           </div>
         </div>

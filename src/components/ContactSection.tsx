@@ -3,7 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { validateContactForm } from '../utils/pricing';
 import { ContactFormData, FormErrors } from '../types';
 import { CONTACT_EMAIL, CONTACT_PHONE, LOCATION_CITY } from '../data/content';
-import { Mail, Phone, MapPin, Send, CheckCircle, Clock, ShieldCheck, X, Check } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Clock, ShieldCheck, X } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ContactSectionProps {
   prefilledService?: string;
@@ -14,10 +15,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   prefilledService = 'Shopify E-Commerce Pro',
   prefilledMessage = '',
 }) => {
+  const { dict, language } = useLanguage();
+  const c = dict.contact;
+
   const [formData, setFormData] = useState<ContactFormData>({
     service: prefilledService,
-    budget: '3.000 € – 6.000 €',
-    timeline: 'Schnellstmöglich (in 2–4 Wochen)',
+    budget: language === 'de' ? '3.000 € – 6.000 €' : '€3,000 – €6,000',
+    timeline: language === 'de' ? 'Schnellstmöglich (in 2–4 Wochen)' : 'ASAP (within 2–4 weeks)',
     name: '',
     email: '',
     phone: '',
@@ -108,17 +112,17 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
             <div className="min-w-0 pr-2">
               <div className="text-xs font-bold text-white tracking-wide">
-                Anfrage erfolgreich versendet!
+                {c.success_title}
               </div>
               <div className="text-xs text-zinc-300 mt-0.5 leading-relaxed">
-                Vielen Dank! Wir prüfen Ihre Anforderungen und melden uns innerhalb von 24 Stunden persönlich bei Ihnen.
+                {c.success_desc}
               </div>
             </div>
 
             <button
               onClick={() => setShowToast(false)}
-              className="text-zinc-400 hover:text-white p-1 rounded-md hover:bg-white/10 shrink-0 transition-colors"
-              aria-label="Benachrichtigung schließen"
+              className="text-zinc-400 hover:text-white p-1 rounded-md hover:bg-white/10 shrink-0 transition-colors cursor-pointer"
+              aria-label="Close notification"
             >
               <X className="w-4 h-4" />
             </button>
@@ -132,13 +136,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
           <div className="lg:col-span-5 space-y-8">
             <div>
               <div className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]">
-                Kontakt &amp; Projektanfrage
+                {c.tag}
               </div>
               <h2 className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight">
-                Lassen Sie uns über Ihr nächstes Webprojekt sprechen.
+                {c.heading}
               </h2>
               <p className="text-zinc-400 mt-4 text-base leading-relaxed">
-                Ob neuer Shopify Onlineshop, fokussierte Kampagnen-Landingpage, Social-Media-Audit oder automatisierte CRM-Workflows mit Google AI Studio: Wir beraten Sie transparent und unverbindlich.
+                {c.subtext}
               </p>
             </div>
 
@@ -152,7 +156,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   <Mail className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-xs text-zinc-400">Direkte E-Mail:</div>
+                  <div className="text-xs text-zinc-400">{c.email_direct}</div>
                   <div className="text-sm font-semibold text-white truncate">{CONTACT_EMAIL}</div>
                 </div>
               </a>
@@ -165,7 +169,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   <Phone className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-xs text-zinc-400">Telefon / Rückruf:</div>
+                  <div className="text-xs text-zinc-400">{c.phone_direct}</div>
                   <div className="text-sm font-semibold text-white truncate">{CONTACT_PHONE}</div>
                 </div>
               </a>
@@ -175,7 +179,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
-                  <div className="text-xs text-zinc-400">Standort:</div>
+                  <div className="text-xs text-zinc-400">{c.location_direct}</div>
                   <div className="text-sm font-semibold text-white">MediaPark / Ehrenfeld, 50672 {LOCATION_CITY}</div>
                 </div>
               </div>
@@ -185,10 +189,16 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
             <div className="p-4 rounded-xl bg-[#141824] border border-white/5 space-y-2 text-xs text-zinc-300">
               <div className="flex items-center gap-2 text-emerald-400 font-semibold">
                 <Clock className="w-4 h-4" />
-                <span>Reaktionszeit: Garantiert binnen 24 Stunden</span>
+                <span>
+                  {language === 'de'
+                    ? 'Reaktionszeit: Garantiert binnen 24 Stunden'
+                    : 'Response time: Guaranteed within 24 hours'}
+                </span>
               </div>
               <p className="text-zinc-400">
-                Sie erhalten keine automatische Standard-Absage, sondern eine fundierte erste Einschätzung zu Machbarkeit, Budget und Zeitplan.
+                {language === 'de'
+                  ? 'Sie erhalten keine Standard-Absage, sondern eine fundierte erste Einschätzung zu Machbarkeit, Budget und Zeitplan.'
+                  : 'You will receive a personalized assessment covering feasibility, technical scope, and exact milestones.'}
               </p>
             </div>
           </div>
@@ -203,7 +213,6 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                   className="py-12 text-center space-y-6"
                 >
-                  {/* Subtle animated SVG checkmark in glowing circle */}
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -236,18 +245,18 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
                   <div>
                     <h3 className="text-2xl font-bold font-display text-white">
-                      Vielen Dank für Ihre Anfrage!
+                      {c.success_title}
                     </h3>
                     <p className="text-zinc-300 text-sm mt-2 max-w-md mx-auto leading-relaxed">
-                      Ihre Projektdaten für <span className="text-white font-semibold">{formData.service}</span> sind sicher bei uns eingegangen. Wir prüfen Ihr Vorhaben und melden uns innerhalb von 24 Stunden persönlich bei Ihnen.
+                      {c.success_desc}
                     </p>
                   </div>
 
                   <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 max-w-md mx-auto text-left text-xs text-zinc-400 space-y-1">
-                    <div><span className="text-zinc-200">Name:</span> {formData.name}</div>
-                    <div><span className="text-zinc-200">E-Mail:</span> {formData.email}</div>
-                    {formData.phone && <div><span className="text-zinc-200">Telefon:</span> {formData.phone}</div>}
-                    <div><span className="text-zinc-200">Budget:</span> {formData.budget}</div>
+                    <div><span className="text-zinc-200">{language === 'de' ? 'Name:' : 'Name:'}</span> {formData.name}</div>
+                    <div><span className="text-zinc-200">{language === 'de' ? 'E-Mail:' : 'Email:'}</span> {formData.email}</div>
+                    {formData.phone && <div><span className="text-zinc-200">{language === 'de' ? 'Telefon:' : 'Phone:'}</span> {formData.phone}</div>}
+                    <div><span className="text-zinc-200">{language === 'de' ? 'Budget:' : 'Budget:'}</span> {formData.budget}</div>
                   </div>
 
                   <button
@@ -255,8 +264,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       setIsSuccess(false);
                       setFormData({
                         service: 'Shopify E-Commerce Pro',
-                        budget: '3.000 € – 6.000 €',
-                        timeline: 'Schnellstmöglich',
+                        budget: language === 'de' ? '3.000 € – 6.000 €' : '€3,000 – €6,000',
+                        timeline: language === 'de' ? 'Schnellstmöglich' : 'ASAP',
                         name: '',
                         email: '',
                         phone: '',
@@ -267,32 +276,46 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                     }}
                     className="text-xs text-zinc-400 hover:text-white underline cursor-pointer"
                   >
-                    Weitere Anfrage senden
+                    {language === 'de' ? 'Weitere Anfrage senden' : 'Send another inquiry'}
                   </button>
                 </motion.div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <h3 className="text-xl font-bold font-display text-white pb-2 border-b border-white/10">
-                    Projektanfrage starten
+                    {language === 'de' ? 'Projektanfrage starten' : 'Start Project Inquiry'}
                   </h3>
 
                   {/* Service Selection */}
                   <div>
                     <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
-                      Gewünschtes Leistungsfeld:
+                      {c.service_label}
                     </label>
                     <select
                       value={formData.service}
                       onChange={(e) => setFormData({ ...formData, service: e.target.value })}
                       className="w-full bg-[#181c26] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#c81e32]"
                     >
-                      <option value="Shopify Onlineshop (Neubau oder Relaunch)">Shopify Onlineshop (Neubau oder Relaunch)</option>
-                      <option value="High-Converting Landingpage">High-Converting Landingpage</option>
-                      <option value="Meta Ads (Instagram & Facebook): Erstellung & Audit">Meta Ads (Instagram &amp; Facebook): Erstellung &amp; Audit</option>
-                      <option value="Social Media Audit & Content-Plan (Instagram & TikTok)">Social Media Audit &amp; Content-Plan (Instagram &amp; TikTok)</option>
-                      <option value="Strategische Analyse (SWOT, PESTEL & Lebenszyklus)">Strategische Analyse (SWOT, PESTEL &amp; Lebenszyklus)</option>
-                      <option value="Google AI Studio & CRM-Automatisierung">Google AI Studio &amp; CRM-Automatisierung</option>
-                      <option value="Komplettpaket (Shop + Meta Ads + CRM)">Komplettpaket (Shop + Meta Ads + CRM)</option>
+                      <option value="Shopify Onlineshop (Neubau oder Relaunch)">
+                        {language === 'de' ? 'Shopify Onlineshop (Neubau oder Relaunch)' : 'Shopify Store (New Build or Relaunch)'}
+                      </option>
+                      <option value="High-Converting Landingpage">
+                        {language === 'de' ? 'High-Converting Landingpage' : 'High-Converting Landing Page'}
+                      </option>
+                      <option value="Meta Ads (Instagram & Facebook): Erstellung & Audit">
+                        {language === 'de' ? 'Meta Ads (Instagram & Facebook): Erstellung & Audit' : 'Meta Ads (Instagram & Facebook): Campaigns & Audit'}
+                      </option>
+                      <option value="Social Media Audit & Content-Plan (Instagram & TikTok)">
+                        {language === 'de' ? 'Social Media Audit & Content-Plan (Instagram & TikTok)' : 'Social Media Audit & Content Plan (Instagram & TikTok)'}
+                      </option>
+                      <option value="Strategische Analyse (SWOT, PESTEL & Lebenszyklus)">
+                        {language === 'de' ? 'Strategische Analyse (SWOT, PESTEL & Lebenszyklus)' : 'Strategic Analysis (SWOT, PESTEL & Lifecycle)'}
+                      </option>
+                      <option value="Google AI Studio & CRM-Automatisierung">
+                        {language === 'de' ? 'Google AI Studio & CRM-Automatisierung' : 'Google AI Studio & CRM Automation'}
+                      </option>
+                      <option value="Komplettpaket (Shop + Meta Ads + CRM)">
+                        {language === 'de' ? 'Komplettpaket (Shop + Meta Ads + CRM)' : 'Full Scale Package (Shop + Meta Ads + CRM)'}
+                      </option>
                     </select>
                   </div>
 
@@ -300,7 +323,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
-                        Geplantes Budget:
+                        {c.budget_label}:
                       </label>
                       <select
                         value={formData.budget}
@@ -310,23 +333,31 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                         <option value="1.500 € – 3.000 €">1.500 € – 3.000 €</option>
                         <option value="3.000 € – 6.000 €">3.000 € – 6.000 €</option>
                         <option value="6.000 € – 12.000 €">6.000 € – 12.000 €</option>
-                        <option value="Über 12.000 €">Über 12.000 €</option>
+                        <option value="Über 12.000 €">{language === 'de' ? 'Über 12.000 €' : 'Over €12,000'}</option>
                       </select>
                     </div>
 
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
-                        Gewünschter Start:
+                        {c.timeline_label}:
                       </label>
                       <select
                         value={formData.timeline}
                         onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
                         className="w-full bg-[#181c26] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#c81e32]"
                       >
-                        <option value="Sofort / Schnellstmöglich">Sofort / Schnellstmöglich</option>
-                        <option value="In 2–4 Wochen">In 2–4 Wochen</option>
-                        <option value="In 1–2 Monaten">In 1–2 Monaten</option>
-                        <option value="Noch in der Planungsphase">Noch in der Planungsphase</option>
+                        <option value="Sofort / Schnellstmöglich">
+                          {language === 'de' ? 'Sofort / Schnellstmöglich' : 'Immediately / ASAP'}
+                        </option>
+                        <option value="In 2–4 Wochen">
+                          {language === 'de' ? 'In 2–4 Wochen' : 'In 2–4 weeks'}
+                        </option>
+                        <option value="In 1–2 Monaten">
+                          {language === 'de' ? 'In 1–2 Monaten' : 'In 1–2 months'}
+                        </option>
+                        <option value="Noch in der Planungsphase">
+                          {language === 'de' ? 'Noch in der Planungsphase' : 'Currently scoping / planning'}
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -335,11 +366,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
-                        Ihr Name *
+                        {c.name_label}
                       </label>
                       <input
                         type="text"
-                        placeholder="z. B. Julia Schneider"
+                        placeholder={c.name_placeholder}
                         value={formData.name}
                         onChange={(e) => {
                           setFormData({ ...formData, name: e.target.value });
@@ -354,11 +385,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
-                        Ihre E-Mail-Adresse *
+                        {c.email_label}
                       </label>
                       <input
                         type="email"
-                        placeholder="name@unternehmen.de"
+                        placeholder={c.email_placeholder}
                         value={formData.email}
                         onChange={(e) => {
                           setFormData({ ...formData, email: e.target.value });
@@ -376,11 +407,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
-                        Telefonnummer (optional)
+                        {c.phone_label}
                       </label>
                       <input
                         type="tel"
-                        placeholder="+49 221 123456"
+                        placeholder={c.phone_placeholder}
                         value={formData.phone}
                         onChange={(e) => {
                           setFormData({ ...formData, phone: e.target.value });
@@ -395,11 +426,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
                     <div>
                       <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
-                        Unternehmen / Website
+                        {c.company_label}
                       </label>
                       <input
                         type="text"
-                        placeholder="z. B. www.mein-shop.de"
+                        placeholder={c.company_placeholder}
                         value={formData.company}
                         onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                         className="w-full bg-[#181c26] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#c81e32]"
@@ -410,11 +441,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   {/* Message */}
                   <div>
                     <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
-                      Kurze Beschreibung Ihres Vorhabens *
+                      {c.message_label}
                     </label>
                     <textarea
                       rows={4}
-                      placeholder="Was möchten Sie erreichen? Z. B.: Neuer Shopify Store für Bekleidung mit Anbindung an Warenwirtschaft und Instagram Ads..."
+                      placeholder={c.message_placeholder}
                       value={formData.message}
                       onChange={(e) => {
                         setFormData({ ...formData, message: e.target.value });
@@ -437,7 +468,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       className="mt-0.5 w-4 h-4 rounded border-zinc-700 bg-zinc-800 text-[#c81e32] focus:ring-0 accent-[#c81e32]"
                     />
                     <label htmlFor="crmInterest" className="text-xs text-zinc-300 leading-normal cursor-pointer">
-                      Ich interessiere mich zusätzlich für die CRM-Automatisierung von Bestellungen &amp; Anfragen mit Google AI Studio.
+                      {c.crm_checkbox}
                     </label>
                   </div>
 
@@ -449,17 +480,21 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       className="w-full py-4 px-6 rounded-md text-xs uppercase tracking-wider font-semibold text-white bg-[#c81e32] hover:bg-[#b01829] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-[#c81e32]/25 disabled:opacity-50"
                     >
                       {isSubmitting ? (
-                        <span>Wird übermittelt...</span>
+                        <span>{c.submitting_btn}</span>
                       ) : (
                         <>
                           <Send className="w-4 h-4" />
-                          <span>Unverbindliche Projektanfrage absenden</span>
+                          <span>{c.submit_btn}</span>
                         </>
                       )}
                     </button>
                     <div className="text-center mt-3 text-[11px] text-zinc-500 flex items-center justify-center gap-1.5">
                       <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>100% DSGVO-konform. Ihre Daten werden streng vertraulich behandelt.</span>
+                      <span>
+                        {language === 'de'
+                          ? '100% DSGVO-konform. Ihre Daten werden streng vertraulich behandelt.'
+                          : '100% GDPR compliant. Your information is encrypted and strictly confidential.'}
+                      </span>
                     </div>
                   </div>
                 </form>

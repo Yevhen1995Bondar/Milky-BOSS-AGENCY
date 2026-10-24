@@ -1,6 +1,7 @@
 import React, { useState, useId } from 'react';
 import { calculateConversionUplift } from '../utils/pricing';
-import { TrendingUp, ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface InteractiveRoiCalculatorProps {
   onApplyCalculation: (estimatedRevenue: number) => void;
@@ -13,6 +14,7 @@ export const InteractiveRoiCalculator: React.FC<InteractiveRoiCalculatorProps> =
   const crId = useId();
   const aovId = useId();
   const liftId = useId();
+  const { language, dict } = useLanguage();
 
   const [visitors, setVisitors] = useState<number>(5000);
   const [conversionRate, setConversionRate] = useState<number>(1.5);
@@ -26,6 +28,8 @@ export const InteractiveRoiCalculator: React.FC<InteractiveRoiCalculatorProps> =
     targetLiftPercent: lift,
   });
 
+  const locale = language === 'de' ? 'de-DE' : 'en-US';
+
   return (
     <section id="roi-calculator" className="py-20 bg-[#0c0e15] border-y border-white/10 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -34,27 +38,39 @@ export const InteractiveRoiCalculator: React.FC<InteractiveRoiCalculatorProps> =
           <div className="lg:col-span-5 space-y-4">
             <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#c81e32]">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>Interaktiver Potenzial-Simulator</span>
+              <span>{dict.calculator.tag}</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold font-display text-white tracking-tight">
-              Was bringt Ihnen eine optimierte Conversion Rate?
+              {dict.calculator.heading}
             </h2>
             <p className="text-zinc-300 text-base leading-relaxed">
-              Selbst eine moderate Steigerung Ihrer Konversionsrate von z. B. 1,5% auf 2,1% hat dank des Zinseszinseffekts enorme Auswirkungen auf Ihren monatlichen Gewinn — ganz ohne zusätzliches Werbebudget.
+              {dict.calculator.subtext}
             </p>
 
             <div className="pt-2 text-xs text-zinc-400 space-y-2">
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#c81e32]" />
-                <span>Schnellere Shopify Ladezeiten reduzieren Abbrüche</span>
+                <span>
+                  {language === 'de'
+                    ? 'Schnellere Shopify Ladezeiten reduzieren Abbrüche'
+                    : 'Sub-second Shopify speeds directly eliminate bounce rates'}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#c81e32]" />
-                <span>Gezielte Instagram &amp; Google Ads senken die Streuverluste</span>
+                <span>
+                  {language === 'de'
+                    ? 'Gezielte Instagram & Google Ads senken Streuverluste'
+                    : 'Targeted Instagram & Google Ads pinpoint high-intent buyers'}
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#c81e32]" />
-                <span>Automatisierte CRM E-Mails holen verlassene Warenkörbe zurück</span>
+                <span>
+                  {language === 'de'
+                    ? 'Automatisierte CRM E-Mails holen verlassene Warenkörbe zurück'
+                    : 'Automated CRM flows recover abandoned checkouts 24/7'}
+                </span>
               </div>
             </div>
           </div>
@@ -67,8 +83,10 @@ export const InteractiveRoiCalculator: React.FC<InteractiveRoiCalculatorProps> =
                 {/* Visitors Slider */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs">
-                    <label htmlFor={visitorsId} className="text-zinc-300 font-medium">Monatliche Besucher:</label>
-                    <span className="font-mono text-white font-bold">{visitors.toLocaleString('de-DE')}</span>
+                    <label htmlFor={visitorsId} className="text-zinc-300 font-medium">
+                      {dict.calculator.monthly_visitors}:
+                    </label>
+                    <span className="font-mono text-white font-bold">{visitors.toLocaleString(locale)}</span>
                   </div>
                   <input
                     id={visitorsId}
@@ -89,7 +107,9 @@ export const InteractiveRoiCalculator: React.FC<InteractiveRoiCalculatorProps> =
                 {/* Conversion Rate Slider */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs">
-                    <label htmlFor={crId} className="text-zinc-300 font-medium">Aktuelle Conversion Rate:</label>
+                    <label htmlFor={crId} className="text-zinc-300 font-medium">
+                      {dict.calculator.current_cr}:
+                    </label>
                     <span className="font-mono text-white font-bold">{conversionRate.toFixed(1)} %</span>
                   </div>
                   <input
@@ -111,7 +131,9 @@ export const InteractiveRoiCalculator: React.FC<InteractiveRoiCalculatorProps> =
                 {/* Average Order Value (AOV) */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs">
-                    <label htmlFor={aovId} className="text-zinc-300 font-medium">Ø Bestellwert / Warenkorb:</label>
+                    <label htmlFor={aovId} className="text-zinc-300 font-medium">
+                      {dict.calculator.avg_order_value}:
+                    </label>
                     <span className="font-mono text-white font-bold">{aov} €</span>
                   </div>
                   <input
@@ -133,7 +155,9 @@ export const InteractiveRoiCalculator: React.FC<InteractiveRoiCalculatorProps> =
                 {/* Expected Lift Slider */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-xs">
-                    <label htmlFor={liftId} className="text-zinc-300 font-medium">Erwartete Optimierung:</label>
+                    <label htmlFor={liftId} className="text-zinc-300 font-medium">
+                      {language === 'de' ? 'Erwartete Optimierung:' : 'Target CRO Lift:'}
+                    </label>
                     <span className="font-mono text-[#c81e32] font-bold">+{lift} % Uplift</span>
                   </div>
                   <input
@@ -157,27 +181,39 @@ export const InteractiveRoiCalculator: React.FC<InteractiveRoiCalculatorProps> =
               <div className="p-5 rounded-xl bg-gradient-to-br from-[#161b26] to-[#12151e] border border-white/10">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
                   <div>
-                    <div className="text-[11px] text-zinc-400 uppercase tracking-wider">Neue Conversion Rate</div>
+                    <div className="text-[11px] text-zinc-400 uppercase tracking-wider">
+                      {language === 'de' ? 'Neue Conversion Rate' : 'Target Conversion Rate'}
+                    </div>
                     <div className="text-xl font-bold text-white font-display mt-0.5 tabular-nums">
                       {results.projectedConversionRate}%
                     </div>
-                    <div className="text-[10px] text-zinc-400">vorher {conversionRate.toFixed(1)}%</div>
+                    <div className="text-[10px] text-zinc-400">
+                      {language === 'de' ? `vorher ${conversionRate.toFixed(1)}%` : `baseline ${conversionRate.toFixed(1)}%`}
+                    </div>
                   </div>
 
                   <div>
-                    <div className="text-[11px] text-zinc-400 uppercase tracking-wider">Zusätzlicher Monatsumsatz</div>
+                    <div className="text-[11px] text-zinc-400 uppercase tracking-wider">
+                      {language === 'de' ? 'Zusätzlicher Monatsumsatz' : 'Monthly Extra Revenue'}
+                    </div>
                     <div className="text-xl font-bold text-emerald-400 font-display mt-0.5 tabular-nums">
-                      +{results.monthlyExtraRevenue.toLocaleString('de-DE')} €
+                      +{results.monthlyExtraRevenue.toLocaleString(locale)} €
                     </div>
-                    <div className="text-[10px] text-zinc-400">pro Monat</div>
+                    <div className="text-[10px] text-zinc-400">
+                      {language === 'de' ? 'pro Monat' : 'per month'}
+                    </div>
                   </div>
 
                   <div>
-                    <div className="text-[11px] text-[#c81e32] font-semibold uppercase tracking-wider">Prognose pro Jahr</div>
-                    <div className="text-2xl font-bold text-white font-display mt-0.5 tabular-nums">
-                      +{results.annualExtraRevenue.toLocaleString('de-DE')} €
+                    <div className="text-[11px] text-[#c81e32] font-semibold uppercase tracking-wider">
+                      {language === 'de' ? 'Prognose pro Jahr' : 'Annual Run-Rate Gain'}
                     </div>
-                    <div className="text-[10px] text-emerald-400 font-medium">Möglicher Mehrertrag</div>
+                    <div className="text-2xl font-bold text-white font-display mt-0.5 tabular-nums">
+                      +{results.annualExtraRevenue.toLocaleString(locale)} €
+                    </div>
+                    <div className="text-[10px] text-emerald-400 font-medium">
+                      {language === 'de' ? 'Möglicher Mehrertrag' : 'Projected growth'}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -185,13 +221,15 @@ export const InteractiveRoiCalculator: React.FC<InteractiveRoiCalculatorProps> =
               {/* Action Button */}
               <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
                 <span className="text-xs text-zinc-400 text-center sm:text-left">
-                  Berechnung basiert auf realen Benchmarks unserer Kölner E-Commerce Projekte.
+                  {language === 'de'
+                    ? 'Berechnung basiert auf realen Benchmarks unserer Kölner E-Commerce Projekte.'
+                    : 'Calculated using empirical benchmarks from our Cologne e-commerce deployments.'}
                 </span>
                 <button
                   onClick={() => onApplyCalculation(results.annualExtraRevenue)}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs uppercase tracking-wider font-semibold text-white bg-[#c81e32] hover:bg-[#b01829] rounded-md transition-colors shrink-0 cursor-pointer"
                 >
-                  <span>Potenzial besprechen</span>
+                  <span>{dict.calculator.apply_cta}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>

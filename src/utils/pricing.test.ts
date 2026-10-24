@@ -88,3 +88,29 @@ test('validateContactForm checks required fields correctly', () => {
   assert.equal(valid.isValid, true);
   assert.equal(Object.keys(valid.errors).length, 0);
 });
+
+test('translations dictionary has matching top-level and nested keys for DE and EN', async () => {
+  const { TRANSLATIONS, SERVICES_I18N, PRICING_PLANS_I18N } = await import('../data/translations');
+
+  const deSections = Object.keys(TRANSLATIONS.de);
+  const enSections = Object.keys(TRANSLATIONS.en);
+  assert.deepEqual(deSections.sort(), enSections.sort());
+
+  for (const sec of deSections) {
+    const deKeys = Object.keys((TRANSLATIONS.de as any)[sec]);
+    const enKeys = Object.keys((TRANSLATIONS.en as any)[sec]);
+    assert.deepEqual(deKeys.sort(), enKeys.sort(), `Section ${sec} keys do not match between DE and EN`);
+  }
+
+  assert.equal(SERVICES_I18N.de.length, SERVICES_I18N.en.length);
+  assert.deepEqual(
+    SERVICES_I18N.de.map((s) => s.id),
+    SERVICES_I18N.en.map((s) => s.id)
+  );
+
+  assert.equal(PRICING_PLANS_I18N.de.length, PRICING_PLANS_I18N.en.length);
+  assert.deepEqual(
+    PRICING_PLANS_I18N.de.map((p) => p.id),
+    PRICING_PLANS_I18N.en.map((p) => p.id)
+  );
+});

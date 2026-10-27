@@ -38,6 +38,7 @@ export interface ProjectCaseStudy {
   techStack: string[];
   duration: string;
   year: string;
+  liveUrl?: string;
 }
 
 export interface PricingPlan {

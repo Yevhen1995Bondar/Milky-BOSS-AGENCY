@@ -15,8 +15,8 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10">
           {/* Brand Info */}
           <div className="md:col-span-5 space-y-4">
-            <a href="#" className="inline-flex items-center" aria-label="Milky BOSS Agency Home">
-              <MilkyBossLogo size="sm" />
+            <a href="#" className="inline-flex items-center group" aria-label="Milky BOSS Agency Home">
+              <MilkyBossLogo size="md" />
             </a>
             <p className="text-zinc-400 max-w-sm leading-relaxed">
               {f.desc}

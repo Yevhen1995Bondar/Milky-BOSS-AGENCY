@@ -6,10 +6,10 @@ import { useLanguage } from '../context/LanguageContext';
 
 interface HeroProps {
   onOpenContact: () => void;
-  onScrollToCalculator: () => void;
+  onScrollToPricing: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onOpenContact, onScrollToCalculator }) => {
+export const Hero: React.FC<HeroProps> = ({ onOpenContact, onScrollToPricing }) => {
   const { dict, language } = useLanguage();
   const h = dict.hero;
 
@@ -72,7 +72,7 @@ export const Hero: React.FC<HeroProps> = ({ onOpenContact, onScrollToCalculator 
               </button>
 
               <button
-                onClick={onScrollToCalculator}
+                onClick={onScrollToPricing}
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium text-zinc-200 bg-white/5 hover:bg-white/10 border border-white/10 rounded-md transition-all cursor-pointer"
               >
                 <TrendingUp className="w-4 h-4 text-[#c81e32]" />

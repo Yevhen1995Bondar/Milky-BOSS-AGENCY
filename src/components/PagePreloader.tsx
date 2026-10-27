@@ -74,7 +74,7 @@ export const PagePreloader: React.FC<PagePreloaderProps> = ({ onComplete }) => {
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="mb-8"
             >
-              <MilkyBossLogo size="lg" />
+              <MilkyBossLogo variant="stacked" size="lg" />
             </motion.div>
 
             {/* Horizontal Progress Bar Container */}

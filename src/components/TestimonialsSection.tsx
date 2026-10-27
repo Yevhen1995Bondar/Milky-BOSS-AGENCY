@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence, type Variants } from 'motion/react';
 import { ChevronLeft, ChevronRight, Star, Quote, Pause, Play, TrendingUp } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -43,7 +43,7 @@ export const TestimonialsSection: React.FC = () => {
 
   const current = testimonials[currentIndex] || testimonials[0];
 
-  const variants = {
+  const variants: Variants = {
     enter: (dir: number) => ({
       x: dir > 0 ? 50 : -50,
       opacity: 0,
@@ -53,7 +53,6 @@ export const TestimonialsSection: React.FC = () => {
       opacity: 1,
       transition: {
         duration: 0.45,
-        ease: [0.16, 1, 0.3, 1],
       },
     },
     exit: (dir: number) => ({
@@ -61,7 +60,6 @@ export const TestimonialsSection: React.FC = () => {
       opacity: 0,
       transition: {
         duration: 0.3,
-        ease: 'easeIn',
       },
     }),
   };

@@ -5,7 +5,6 @@ import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
 import { Marquee } from './components/Marquee';
 import { ServicesSection } from './components/ServicesSection';
-import { InteractiveRoiCalculator } from './components/InteractiveRoiCalculator';
 import { PortfolioSection } from './components/PortfolioSection';
 import { TestimonialsSection } from './components/TestimonialsSection';
 import { WorkflowSection } from './components/WorkflowSection';
@@ -51,8 +50,8 @@ function MainApplication() {
     }
   };
 
-  const scrollToCalculator = () => {
-    const el = document.getElementById('roi-calculator');
+  const scrollToPricing = () => {
+    const el = document.getElementById('pricing');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
@@ -86,17 +85,6 @@ function MainApplication() {
     scrollToContact();
   };
 
-  const handleApplyRoiCalculation = (estimatedRevenue: number) => {
-    setContactService(language === 'de' ? 'Conversion-Optimierung & E-Commerce' : 'Conversion Rate Optimization & E-Commerce');
-    const formattedRev = estimatedRevenue.toLocaleString(language === 'de' ? 'de-DE' : 'en-US');
-    if (language === 'de') {
-      setContactMessage(`Hallo Milky BOSS Team, laut Ihrem ROI-Simulator liegt unser jährliches Mehrumsatzpotenzial bei ca. ${formattedRev} €. Wir möchten dies gerne konkret besprechen.`);
-    } else {
-      setContactMessage(`Hello Milky BOSS Team, according to your ROI simulator our estimated annual revenue gain is approx. €${formattedRev}. We would like to discuss this concrete business case.`);
-    }
-    scrollToContact();
-  };
-
   return (
     <div className="min-h-screen bg-[#090a0f] text-zinc-100 flex flex-col selection:bg-[#c81e32] selection:text-white relative">
       {/* 1. Initial Page Loading Animation */}
@@ -118,7 +106,7 @@ function MainApplication() {
         {/* 1. Hero */}
         <Hero
           onOpenContact={scrollToContact}
-          onScrollToCalculator={scrollToCalculator}
+          onScrollToPricing={scrollToPricing}
         />
 
         {/* 2. Infinite Tech Marquee */}
@@ -127,11 +115,6 @@ function MainApplication() {
         {/* 3. Services / Leistungsbereiche */}
         <SectionReveal>
           <ServicesSection onSelectService={handleSelectService} />
-        </SectionReveal>
-
-        {/* 4. Interactive ROI Simulator */}
-        <SectionReveal>
-          <InteractiveRoiCalculator onApplyCalculation={handleApplyRoiCalculation} />
         </SectionReveal>
 
         {/* 5. Projects & Case Studies */}

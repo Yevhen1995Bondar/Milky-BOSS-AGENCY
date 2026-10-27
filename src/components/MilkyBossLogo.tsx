@@ -1,118 +1,111 @@
 import React from 'react';
 
-interface MilkyBossLogoProps {
+export interface MilkyBossLogoProps {
   className?: string;
-  variant?: 'full' | 'mark';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: 'full' | 'horizontal' | 'stacked' | 'mark';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  showTagline?: boolean;
 }
 
 export const MilkyBossLogo: React.FC<MilkyBossLogoProps> = ({
   className = '',
-  variant = 'full',
+  variant = 'horizontal',
   size = 'md',
+  showTagline = true,
 }) => {
-  const sizeMap = {
-    sm: { icon: 26, height: 26, text: 'text-sm', badge: 'text-[9px]' },
-    md: { icon: 34, height: 34, text: 'text-lg', badge: 'text-[10px]' },
-    lg: { icon: 44, height: 44, text: 'text-xl', badge: 'text-xs' },
+  const emblemSizeMap = {
+    sm: 'h-7 sm:h-8',
+    md: 'h-8 sm:h-9 md:h-10',
+    lg: 'h-12 sm:h-14',
+    xl: 'h-20 sm:h-24',
   };
 
-  const currentSize = sizeMap[size];
-
-  // Precision vector diamond emblem with carbon and ruby red facets
-  const Emblem = (
-    <div
-      className="relative flex items-center justify-center shrink-0"
-      style={{ width: currentSize.icon, height: currentSize.icon }}
-    >
-      <svg
-        viewBox="0 0 64 64"
-        className="w-full h-full drop-shadow-[0_2px_12px_rgba(200,30,50,0.35)]"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <defs>
-          <linearGradient id="mbCarbon" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#2c3242" />
-            <stop offset="50%" stopColor="#171a23" />
-            <stop offset="100%" stopColor="#0b0d13" />
-          </linearGradient>
-
-          <linearGradient id="mbCrimson" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#ff3852" />
-            <stop offset="50%" stopColor="#c81e32" />
-            <stop offset="100%" stopColor="#8d1121" />
-          </linearGradient>
-        </defs>
-
-        {/* Ambient back glow */}
-        <rect
-          x="18"
-          y="18"
-          width="28"
-          height="28"
-          rx="4"
-          transform="rotate(45 32 32)"
-          fill="#c81e32"
-          opacity="0.3"
-        />
-
-        {/* Left Carbon facet */}
-        <path
-          d="M 32 8 L 8 32 L 32 56 Z"
-          fill="url(#mbCarbon)"
-          stroke="#3d4457"
-          strokeWidth="1"
-        />
-
-        {/* Right Crimson facet */}
-        <path
-          d="M 32 8 L 56 32 L 32 56 Z"
-          fill="url(#mbCrimson)"
-          stroke="#ff4a62"
-          strokeWidth="1"
-        />
-
-        {/* Dynamic Stylized ribbon dividing facets */}
-        <path
-          d="M 37 16 C 33 16 26.5 19 26.5 25 C 26.5 32 37.5 33 37.5 40 C 37.5 46.5 31 50 25.5 49"
-          stroke="#ffffff"
-          strokeWidth="5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        />
-
-        {/* Inner specular gloss line */}
-        <path
-          d="M 36.5 18 C 33.5 18 28.5 20.5 28.5 25"
-          stroke="#ffffff"
-          strokeWidth="1.75"
-          strokeLinecap="round"
-          fill="none"
-          opacity="0.9"
-        />
-      </svg>
-    </div>
-  );
+  const textSizes = {
+    sm: { title: 'text-base sm:text-lg', badge: 'text-[9px]' },
+    md: { title: 'text-lg sm:text-xl md:text-2xl', badge: 'text-[10px]' },
+    lg: { title: 'text-2xl sm:text-3xl', badge: 'text-xs' },
+    xl: { title: 'text-4xl sm:text-5xl', badge: 'text-sm' },
+  };
 
   if (variant === 'mark') {
-    return <div className={`inline-flex items-center ${className}`}>{Emblem}</div>;
+    return (
+      <div className={`inline-flex items-center shrink-0 ${className}`}>
+        <img
+          src="/assets/milkyboss-emblem-transparent.png"
+          alt="Milky BOSS Emblem"
+          className={`${emblemSizeMap[size]} w-auto object-contain drop-shadow-[0_2px_12px_rgba(200,30,50,0.5)] transition-transform duration-300 hover:scale-105`}
+          loading="eager"
+        />
+      </div>
+    );
   }
 
+  if (variant === 'stacked') {
+    return (
+      <div className={`inline-flex flex-col items-center justify-center text-center shrink-0 ${className}`}>
+        <div className="relative mb-3 flex items-center justify-center">
+          <div className="absolute inset-0 bg-[#c81e32]/25 blur-xl rounded-full" />
+          <img
+            src="/assets/milkyboss-emblem-transparent.png"
+            alt="Milky BOSS Emblem"
+            className={`${size === 'lg' ? 'h-24 sm:h-28' : 'h-16 sm:h-20'} w-auto object-contain relative z-10 drop-shadow-[0_4px_24px_rgba(200,30,50,0.65)]`}
+            loading="eager"
+          />
+        </div>
+        <div className="flex items-baseline gap-2 leading-none">
+          <span className="font-display font-black tracking-tight text-white text-2xl sm:text-3xl bg-gradient-to-b from-white via-zinc-100 to-zinc-300 bg-clip-text text-transparent">
+            MILKY
+          </span>
+          <span className="font-display font-black tracking-tight text-white text-2xl sm:text-3xl">
+            BOSS
+          </span>
+        </div>
+        <div className="flex items-center gap-2 mt-2">
+          <span className="h-px w-6 bg-gradient-to-r from-transparent to-[#c81e32]" />
+          <span className="text-[11px] tracking-[0.25em] font-mono font-bold uppercase text-[#c81e32] leading-none">
+            AGENCY
+          </span>
+          <span className="h-px w-6 bg-gradient-to-l from-transparent to-[#c81e32]" />
+        </div>
+      </div>
+    );
+  }
+
+  // Horizontal lockup (Default / Full)
   return (
-    <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
-      {Emblem}
-      <div className="flex items-baseline gap-1.5 leading-none">
-        <span className={`font-light tracking-tight text-zinc-100 font-display ${currentSize.text}`}>
-          Milky
-        </span>
-        <span className={`font-black tracking-tight text-white font-display ${currentSize.text}`}>
-          BOSS
-        </span>
-        <span className={`font-mono font-semibold tracking-wider text-[#c81e32] uppercase ${currentSize.badge}`}>
-          Agency
-        </span>
+    <div className={`inline-flex items-center gap-3 shrink-0 select-none group ${className}`}>
+      {/* 3D Growth Emblem with Ambient Ruby Glow */}
+      <div className="relative flex items-center justify-center shrink-0">
+        <div className="absolute -inset-1 bg-[#c81e32]/20 blur-md rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <img
+          src="/assets/milkyboss-emblem-transparent.png"
+          alt="Milky BOSS"
+          className={`${emblemSizeMap[size]} w-auto object-contain drop-shadow-[0_2px_12px_rgba(200,30,50,0.45)] transition-transform duration-300 group-hover:scale-105`}
+          loading="eager"
+        />
+      </div>
+
+      {/* Razor-Sharp Chrome & Ruby Typography */}
+      <div className="flex flex-col justify-center">
+        <div className="flex items-baseline gap-1.5 leading-none">
+          <span className={`font-display font-black tracking-tight text-white ${textSizes[size].title} bg-gradient-to-b from-white via-zinc-100 to-zinc-300 bg-clip-text text-transparent`}>
+            MILKY
+          </span>
+          <span className={`font-display font-black tracking-tight text-white ${textSizes[size].title}`}>
+            BOSS
+          </span>
+        </div>
+        {showTagline && (
+          <div className="flex items-center gap-1.5 mt-1">
+            <span className={`font-mono font-bold tracking-[0.22em] uppercase text-[#c81e32] ${textSizes[size].badge} leading-none`}>
+              AGENCY
+            </span>
+            <span className="w-1 h-1 rounded-full bg-[#c81e32]" />
+            <span className="text-[9px] tracking-wider font-mono text-zinc-400 uppercase leading-none hidden sm:inline">
+              Digital &amp; E-Com
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

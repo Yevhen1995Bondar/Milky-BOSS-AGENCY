@@ -14,10 +14,10 @@ export const MilkyBossLogo: React.FC<MilkyBossLogoProps> = ({
   showTagline = true,
 }) => {
   const emblemSizeMap = {
-    sm: 'h-8 sm:h-9',
-    md: 'h-9 sm:h-10 md:h-11',
-    lg: 'h-14 sm:h-16',
-    xl: 'h-20 sm:h-24',
+    sm: 'h-8 sm:h-9 w-auto',
+    md: 'h-9 sm:h-10 md:h-11 w-auto',
+    lg: 'h-14 sm:h-16 w-auto',
+    xl: 'h-20 sm:h-24 w-auto',
   };
 
   const textSizes = {
@@ -27,14 +27,41 @@ export const MilkyBossLogo: React.FC<MilkyBossLogoProps> = ({
     xl: { title: 'text-4xl sm:text-5xl', badge: 'text-sm' },
   };
 
+  // Responsive modern picture element for high-performance LCP (<15 KiB AVIF vs >140 KiB PNG)
+  const renderResponsiveEmblem = (customClass: string) => (
+    <picture className="inline-flex items-center shrink-0">
+      <source
+        type="image/avif"
+        srcSet="/assets/milkyboss-emblem-1x.avif 1x, /assets/milkyboss-emblem-2x.avif 2x"
+      />
+      <source
+        type="image/webp"
+        srcSet="/assets/milkyboss-emblem-1x.webp 1x, /assets/milkyboss-emblem-2x.webp 2x"
+      />
+      <img
+        src="/assets/milkyboss-emblem-1x.webp"
+        alt="Milky BOSS Agency Emblem"
+        width="307"
+        height="168"
+        fetchPriority="high"
+        loading="eager"
+        decoding="async"
+        className={`${customClass} object-contain`}
+      />
+    </picture>
+  );
+
   if (variant === 'badge') {
     return (
       <div className={`inline-flex items-center shrink-0 ${className}`}>
         <img
           src="/assets/milkyboss-dog-icon-squircle.png"
           alt="Milky BOSS Agency"
-          className={`${emblemSizeMap[size]} w-auto object-contain rounded-2xl drop-shadow-[0_4px_16px_rgba(200,30,50,0.35)] transition-transform duration-300 hover:scale-105`}
+          width="128"
+          height="128"
           loading="eager"
+          decoding="async"
+          className={`${emblemSizeMap[size]} object-contain rounded-2xl drop-shadow-[0_4px_16px_rgba(200,30,50,0.35)] transition-transform duration-300 hover:scale-105`}
         />
       </div>
     );
@@ -43,12 +70,9 @@ export const MilkyBossLogo: React.FC<MilkyBossLogoProps> = ({
   if (variant === 'mark') {
     return (
       <div className={`inline-flex items-center shrink-0 ${className}`}>
-        <img
-          src="/assets/milkyboss-dog-emblem-transparent.png"
-          alt="Milky BOSS Chihuahua Emblem"
-          className={`${emblemSizeMap[size]} w-auto object-contain drop-shadow-[0_2px_14px_rgba(200,30,50,0.5)] transition-transform duration-300 hover:scale-105`}
-          loading="eager"
-        />
+        {renderResponsiveEmblem(
+          `${emblemSizeMap[size]} drop-shadow-[0_2px_14px_rgba(200,30,50,0.5)] transition-transform duration-300 hover:scale-105`
+        )}
       </div>
     );
   }
@@ -58,12 +82,11 @@ export const MilkyBossLogo: React.FC<MilkyBossLogoProps> = ({
       <div className={`inline-flex flex-col items-center justify-center text-center shrink-0 ${className}`}>
         <div className="relative mb-3 flex items-center justify-center">
           <div className="absolute inset-0 bg-[#c81e32]/25 blur-2xl rounded-full scale-110" />
-          <img
-            src="/assets/milkyboss-dog-emblem-transparent.png"
-            alt="Milky BOSS Emblem"
-            className={`${size === 'lg' ? 'h-24 sm:h-28' : 'h-16 sm:h-20'} w-auto object-contain relative z-10 drop-shadow-[0_6px_28px_rgba(200,30,50,0.7)]`}
-            loading="eager"
-          />
+          <div className="relative z-10">
+            {renderResponsiveEmblem(
+              `${size === 'lg' ? 'h-24 sm:h-28' : 'h-16 sm:h-20'} w-auto drop-shadow-[0_6px_28px_rgba(200,30,50,0.7)]`
+            )}
+          </div>
         </div>
         <div className="flex items-baseline gap-2 leading-none">
           <span className="font-display font-black tracking-tight text-white text-2xl sm:text-3xl bg-gradient-to-b from-white via-zinc-100 to-zinc-300 bg-clip-text text-transparent">
@@ -90,15 +113,14 @@ export const MilkyBossLogo: React.FC<MilkyBossLogoProps> = ({
       {/* 3D Chihuahua Mascot Emblem with Ambient Ruby Glow */}
       <div className="relative flex items-center justify-center shrink-0">
         <div className="absolute -inset-1 bg-[#c81e32]/25 blur-md rounded-full opacity-60 group-hover:opacity-100 transition-opacity duration-300" />
-        <img
-          src="/assets/milkyboss-dog-emblem-transparent.png"
-          alt="Milky BOSS"
-          className={`${emblemSizeMap[size]} w-auto object-contain drop-shadow-[0_2px_14px_rgba(200,30,50,0.5)] transition-transform duration-300 group-hover:scale-105 relative z-10`}
-          loading="eager"
-        />
+        <div className="relative z-10">
+          {renderResponsiveEmblem(
+            `${emblemSizeMap[size]} drop-shadow-[0_2px_14px_rgba(200,30,50,0.5)] transition-transform duration-300 group-hover:scale-105`
+          )}
+        </div>
       </div>
 
-      {/* Razor-Sharp Chrome & Ruby Typography matching the new 3D logo */}
+      {/* Razor-Sharp Chrome & Ruby Typography matching the 3D logo */}
       <div className="flex flex-col justify-center">
         <div className="flex items-baseline gap-1.5 leading-none">
           <span className={`font-display font-black tracking-tight text-white ${textSizes[size].title} bg-gradient-to-b from-white via-zinc-100 to-zinc-300 bg-clip-text text-transparent`}>
@@ -123,3 +145,4 @@ export const MilkyBossLogo: React.FC<MilkyBossLogoProps> = ({
     </div>
   );
 };
+

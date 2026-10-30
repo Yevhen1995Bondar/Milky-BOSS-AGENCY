@@ -60,11 +60,10 @@ export const HeroParticleBackground: React.FC = () => {
       active: false,
     };
 
-    const handleResize = () => {
-      if (!canvas || !container) return;
-      const rect = container.getBoundingClientRect();
-      width = rect.width;
-      height = rect.height;
+    const updateDimensions = (newWidth: number, newHeight: number) => {
+      if (!canvas || !ctx || newWidth <= 0 || newHeight <= 0) return;
+      width = Math.floor(newWidth);
+      height = Math.floor(newHeight);
       dpr = Math.min(window.devicePixelRatio || 1, 2);
 
       canvas.width = Math.floor(width * dpr);
@@ -101,12 +100,10 @@ export const HeroParticleBackground: React.FC = () => {
       }
     };
 
-    // Mouse Tracking relative to container
+    // Zero-reflow mouse tracking: use e.offsetX / e.offsetY directly without getBoundingClientRect
     const onMouseMove = (e: MouseEvent) => {
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
+      mouse.x = e.offsetX;
+      mouse.y = e.offsetY;
       mouse.active = true;
     };
 
@@ -117,10 +114,8 @@ export const HeroParticleBackground: React.FC = () => {
     };
 
     const onClick = (e: MouseEvent) => {
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
-      const clickX = e.clientX - rect.left;
-      const clickY = e.clientY - rect.top;
+      const clickX = e.offsetX;
+      const clickY = e.offsetY;
 
       // Create shockwave pulse
       pulseWaves.push({
@@ -153,15 +148,21 @@ export const HeroParticleBackground: React.FC = () => {
     );
     observer.observe(container);
 
-    // Initial sizing
-    handleResize();
-    const resizeObserver = new ResizeObserver(() => handleResize());
+    // Initial sizing and continuous tracking via ResizeObserver contentRect (no layout reflow)
+    const resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) {
+        const { width: w, height: h } = entry.contentRect;
+        updateDimensions(w, h);
+      }
+    });
     resizeObserver.observe(container);
 
-    // Attach mouse listeners to window/container
-    container.addEventListener('mousemove', onMouseMove);
-    container.addEventListener('mouseleave', onMouseLeave);
+    // Attach mouse listeners with passive performance
+    container.addEventListener('mousemove', onMouseMove, { passive: true });
+    container.addEventListener('mouseleave', onMouseLeave, { passive: true });
     container.addEventListener('click', onClick);
+
 
     // Render loop
     const maxLineDist = 110;

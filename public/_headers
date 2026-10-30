@@ -1,0 +1,18 @@
+# Production Cache-Control rules for agency.milkyboss.de
+# 1 Year immutable cache for fingerprinted / static assets (Fonts, Images, CSS, JS)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+/favicon.ico
+  Cache-Control: public, max-age=604800
+
+# HTML documents: must revalidate to guarantee instant delivery of updates
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin

@@ -1,0 +1,6 @@
+{
+  "summary":  "Комплексный план оптимизации производительности сайта agency.milkyboss.de на основе аудита Google Lighthouse (PageSpeed Insights). Включает переход на сверхлегкие форматы AVIF/WebP с responsive picture разметкой (экономия ~140-1000 КиБ), устранение блокирующих сеть внешних запросов через локальный селф-хостинг шрифтов woff2 с font-display: swap, внедрение Critical CSS и high-priority preload для LCP, а также рефакторинг чтения/записи DOM с использованием requestAnimationFrame для полной ликвидации принудительного reflow.",
+  "updatedAt":  "2026-10-30T16:14:02.683397412Z",
+  "requestFeedback":  true,
+  "userFacing":  true
+}

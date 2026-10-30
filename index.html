@@ -50,13 +50,55 @@
     />
     <meta name="twitter:image" content="https://milkyboss.de/assets/milkyboss-og.png" />
 
-    <!-- Google Fonts Preconnect -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- High-Priority LCP Image Preload (Responsive AVIF with Retina fallback) -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      as="image"
+      href="/assets/milkyboss-emblem-2x.avif"
+      type="image/avif"
+      fetchpriority="high"
+      imagesrcset="/assets/milkyboss-emblem-1x.avif 307w, /assets/milkyboss-emblem-2x.avif 614w"
+      imagesizes="(max-width: 640px) 307px, 614px"
     />
+
+    <!-- Preload Critical Local WOFF2 Fonts (Zero Render-Blocking Network Chain) -->
+    <link
+      rel="preload"
+      as="font"
+      href="/assets/fonts/font-3.woff2"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="preload"
+      as="font"
+      href="/assets/fonts/font-25.woff2"
+      type="font/woff2"
+      crossorigin="anonymous"
+    />
+
+    <!-- Critical Inline CSS: Dark background, typography fallbacks, zero CLS dimensions -->
+    <style>
+      :root {
+        --brand-red: #c81e32;
+        --brand-dark: #090a0f;
+      }
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #090a0f;
+        color: #e2e8f0;
+        font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      }
+      #root {
+        min-height: 100vh;
+        background-color: #090a0f;
+      }
+      /* Prevent layout shift on logo load */
+      header img, header picture {
+        aspect-ratio: 307 / 168;
+      }
+    </style>
 
     <!-- Schema.org JSON-LD: ProfessionalService / LocalBusiness Köln -->
     <script type="application/ld+json">

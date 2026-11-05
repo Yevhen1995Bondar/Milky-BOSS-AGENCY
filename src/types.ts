@@ -25,7 +25,7 @@ export interface ProjectCaseStudy {
   title: string;
   client: string;
   location: string;
-  category: 'shopify' | 'landingpage' | 'corporate';
+  category: 'shopify' | 'landingpage' | 'corporate' | 'smm';
   categoryLabel: string;
   image: string;
   overview: string;
@@ -39,7 +39,10 @@ export interface ProjectCaseStudy {
   duration: string;
   year: string;
   liveUrl?: string;
+  pdfUrl?: string;
+  metricsImage?: string;
 }
+
 
 export interface PricingPlan {
   id: string;

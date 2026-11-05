@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { ProjectCaseStudy } from '../types';
-import { ArrowUpRight, ExternalLink } from 'lucide-react';
+import { ArrowUpRight, ExternalLink, FileText } from 'lucide-react';
 import { ProjectModal } from './ProjectModal';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -16,10 +16,12 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onRequestPro
 
   const categories = [
     { id: 'all', label: language === 'de' ? 'Alle Projekte' : 'All Projects' },
+    { id: 'smm', label: language === 'de' ? 'SMM & Content' : 'SMM & Content Strategy' },
     { id: 'shopify', label: language === 'de' ? 'Shopify Stores' : 'Shopify Stores' },
     { id: 'landingpage', label: language === 'de' ? 'Landingpages' : 'Landing Pages' },
     { id: 'corporate', label: language === 'de' ? 'Corporate & CRM' : 'Corporate & CRM' },
   ];
+
 
   const filteredProjects =
     selectedCategory === 'all'
@@ -81,7 +83,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onRequestPro
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#11141c] via-transparent to-black/30" />
-                <div className="absolute top-4 left-4 flex items-center gap-2">
+                <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2">
                   <span className="px-3 py-1 rounded-full text-xs font-semibold bg-black/60 backdrop-blur-md text-white border border-white/10">
                     {project.categoryLabel}
                   </span>
@@ -99,7 +101,21 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onRequestPro
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   )}
+                  {project.pdfUrl && (
+                    <a
+                      href={project.pdfUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-[#c81e32] hover:bg-[#e5253e] text-white shadow-lg shadow-[#c81e32]/40 flex items-center gap-1 transition-all"
+                      title={language === 'de' ? 'Original PDF Case Study öffnen' : 'Open PDF Case Study'}
+                    >
+                      <FileText className="w-3 h-3" />
+                      <span>PDF Study</span>
+                    </a>
+                  )}
                 </div>
+
                 <div className="absolute top-4 right-4 text-xs font-mono text-zinc-300 bg-black/40 backdrop-blur-md px-2 py-0.5 rounded">
                   {project.location}
                 </div>
@@ -153,6 +169,17 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onRequestPro
                           <ExternalLink className="w-3 h-3" />
                         </a>
                       )}
+                      {project.pdfUrl && (
+                        <a
+                          href={project.pdfUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs px-2.5 py-1.5 rounded bg-[#c81e32]/20 hover:bg-[#c81e32] text-white border border-[#c81e32]/40 transition-colors inline-flex items-center gap-1 font-medium"
+                        >
+                          <FileText className="w-3 h-3" />
+                          <span>PDF</span>
+                        </a>
+                      )}
                       <button
                         onClick={() => onRequestProject(project.title)}
                         className="text-xs px-3 py-1.5 rounded bg-white/5 hover:bg-[#c81e32] text-zinc-200 hover:text-white transition-colors cursor-pointer"
@@ -160,6 +187,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onRequestPro
                         {language === 'de' ? 'Anfragen' : 'Inquire'}
                       </button>
                     </div>
+
                   </div>
                 </div>
               </div>

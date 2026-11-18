@@ -74,3 +74,32 @@ export interface FormErrors {
   phone?: string;
   message?: string;
 }
+
+export type InquiryStatus = 'new' | 'in_review' | 'contacted' | 'archived';
+
+export interface ProjectInquiryRecord {
+  id: string;
+  requestedService: string;
+  budget: string;
+  timeline: string;
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  message: string;
+  crmInterest: boolean;
+  language: 'de' | 'en';
+  status: InquiryStatus;
+  userId: string;
+  adminNote: string;
+  createdAt?: { seconds: number; nanoseconds: number } | null;
+  updatedAt?: { seconds: number; nanoseconds: number } | null;
+}
+
+export interface UserProfileRecord {
+  uid: string;
+  displayName: string;
+  photoURL: string;
+  role: 'client' | 'admin';
+}
+

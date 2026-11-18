@@ -13,7 +13,10 @@ import { FaqSection } from './components/FaqSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { PagePreloader } from './components/PagePreloader';
+import { PortalModal } from './components/PortalModal';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import { FirebaseProvider } from './context/FirebaseContext';
 
 // Reusable viewport-triggered reveal container with Framer Motion
 interface SectionRevealProps {
@@ -39,6 +42,7 @@ const SectionReveal: React.FC<SectionRevealProps> = ({ children, id, delay = 0 }
 
 function MainApplication() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [portalOpen, setPortalOpen] = useState(false);
   const { language } = useLanguage();
   const [contactService, setContactService] = useState<string>('Shopify Onlineshop (Neubau oder Relaunch)');
   const [contactMessage, setContactMessage] = useState<string>('');
@@ -94,7 +98,10 @@ function MainApplication() {
       <ScrollProgressBar />
 
       {/* Top Navbar with Language Switcher */}
-      <Navbar onOpenContact={scrollToContact} />
+      <Navbar
+        onOpenContact={scrollToContact}
+        onOpenPortal={() => setPortalOpen(true)}
+      />
 
       {/* Main Content Area: Smooth entrance after preloader finishes */}
       <motion.main
@@ -153,14 +160,25 @@ function MainApplication() {
 
       {/* Footer */}
       <Footer />
+
+      {/* Client & Agency Firebase Portal Modal */}
+      <PortalModal
+        isOpen={portalOpen}
+        onClose={() => setPortalOpen(false)}
+        onNewInquiry={scrollToContact}
+      />
     </div>
   );
 }
 
 export default function App() {
   return (
-    <LanguageProvider>
-      <MainApplication />
-    </LanguageProvider>
+    <ErrorBoundary>
+      <FirebaseProvider>
+        <LanguageProvider>
+          <MainApplication />
+        </LanguageProvider>
+      </FirebaseProvider>
+    </ErrorBoundary>
   );
 }

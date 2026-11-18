@@ -1,0 +1,209 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------------------
+    // Global Safety Net (Default Deny)
+    // -------------------------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // -------------------------------------------------------------------------
+    // Reusable Hardened Global Helpers
+    // -------------------------------------------------------------------------
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isEmailVerified() && (
+        request.auth.token.email == 'teams@milkyboss.de' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidEmail(val) {
+      return val is string && val.size() >= 5 && val.size() <= 160 && val.matches('^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$');
+    }
+
+    // -------------------------------------------------------------------------
+    // Validation Blueprints
+    // -------------------------------------------------------------------------
+    function isValidUserProfile(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'photoURL', 'role', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'displayName', 'photoURL', 'role', 'createdAt', 'updatedAt'])
+        && isValidId(data.uid)
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 120
+        && data.photoURL is string && data.photoURL.size() <= 500
+        && data.role in ['client', 'admin']
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidUserPrivateInfo(data) {
+      return data.keys().hasAll(['uid', 'email', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'email', 'updatedAt'])
+        && isValidId(data.uid)
+        && isValidEmail(data.email)
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidInquiry(data) {
+      return data.keys().hasAll([
+          'requestedService', 'budget', 'timeline', 'name', 'email',
+          'phone', 'company', 'message', 'crmInterest', 'language',
+          'status', 'userId', 'adminNote', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'requestedService', 'budget', 'timeline', 'name', 'email',
+          'phone', 'company', 'message', 'crmInterest', 'language',
+          'status', 'userId', 'adminNote', 'createdAt', 'updatedAt'
+        ])
+        && data.requestedService is string && data.requestedService.size() >= 1 && data.requestedService.size() <= 160
+        && data.budget is string && data.budget.size() >= 1 && data.budget.size() <= 80
+        && data.timeline is string && data.timeline.size() >= 1 && data.timeline.size() <= 100
+        && data.name is string && data.name.size() >= 2 && data.name.size() <= 120
+        && isValidEmail(data.email)
+        && data.phone is string && data.phone.size() <= 40
+        && data.company is string && data.company.size() <= 160
+        && data.message is string && data.message.size() >= 10 && data.message.size() <= 4000
+        && data.crmInterest is bool
+        && data.language in ['de', 'en']
+        && data.status in ['new', 'in_review', 'contacted', 'archived']
+        && data.userId is string && data.userId.size() <= 128
+        && data.adminNote is string && data.adminNote.size() <= 2000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // -------------------------------------------------------------------------
+    // Collection Rules
+    // -------------------------------------------------------------------------
+
+    // User public-safe profiles (PII isolated in /private/info)
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && (isOwner(userId) || isAdmin());
+      allow list: if isAdmin();
+
+      allow create: if isEmailVerified()
+        && isValidId(userId)
+        && isOwner(userId)
+        && isValidUserProfile(incoming())
+        && incoming().uid == request.auth.uid
+        && incoming().role == 'client'
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+
+      allow update: if isEmailVerified()
+        && isValidId(userId)
+        && isValidUserProfile(incoming())
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          isAdmin() ||
+          (
+            isOwner(userId)
+            && incoming().role == existing().role
+            && incoming().diff(existing()).affectedKeys().hasOnly(['displayName', 'photoURL', 'updatedAt'])
+          )
+        );
+
+      allow delete: if isAdmin() && isValidId(userId);
+
+      // Isolated PII subcollection (Master Gate checks parent user doc)
+      match /private/{docId} {
+        allow get: if isSignedIn()
+          && isValidId(userId)
+          && docId == 'info'
+          && (isOwner(userId) || isAdmin());
+        allow list: if false;
+
+        allow create: if isEmailVerified()
+          && isValidId(userId)
+          && docId == 'info'
+          && isOwner(userId)
+          && isValidUserPrivateInfo(incoming())
+          && incoming().uid == request.auth.uid
+          && incoming().updatedAt == request.time
+          && existsAfter(/databases/$(database)/documents/users/$(userId));
+
+        allow update: if isEmailVerified()
+          && isValidId(userId)
+          && docId == 'info'
+          && (isOwner(userId) || isAdmin())
+          && isValidUserPrivateInfo(incoming())
+          && incoming().uid == existing().uid
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly(['email', 'updatedAt'])
+          && exists(/databases/$(database)/documents/users/$(userId));
+
+        allow delete: if isAdmin() && isValidId(userId) && docId == 'info';
+      }
+    }
+
+    // Project Inquiries (Lead Capture + Client Tracking + Agency Admin Management)
+    match /inquiries/{inquiryId} {
+      allow get: if isSignedIn()
+        && isValidId(inquiryId)
+        && (
+          isAdmin() ||
+          (isEmailVerified() && existing().userId != '' && existing().userId == request.auth.uid)
+        );
+
+      allow list: if isSignedIn()
+        && (
+          isAdmin() ||
+          (isEmailVerified() && resource.data.userId != '' && resource.data.userId == request.auth.uid)
+        );
+
+      // Public agency lead capture OR signed-in client submission
+      allow create: if isValidId(inquiryId)
+        && isValidInquiry(incoming())
+        && incoming().status == 'new'
+        && incoming().adminNote == ''
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && (
+          (!isSignedIn() && incoming().userId == '') ||
+          (isEmailVerified() && incoming().userId == request.auth.uid)
+        );
+
+      // Action-Based Update Pattern (Admin triage / archiving only)
+      allow update: if isAdmin()
+        && isValidId(inquiryId)
+        && isValidInquiry(incoming())
+        && incoming().createdAt == existing().createdAt
+        && incoming().userId == existing().userId
+        && incoming().email == existing().email
+        && incoming().name == existing().name
+        && incoming().updatedAt == request.time
+        && (existing().status != 'archived' || isAdmin())
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminNote', 'updatedAt']);
+
+      allow delete: if isAdmin() && isValidId(inquiryId);
+    }
+  }
+}

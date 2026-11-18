@@ -1,4 +1,5 @@
 import React from 'react';
+import { resolveAssetUrl } from '../utils/assets';
 
 export interface MilkyBossLogoProps {
   className?: string;
@@ -32,14 +33,14 @@ export const MilkyBossLogo: React.FC<MilkyBossLogoProps> = ({
     <picture className="inline-flex items-center shrink-0">
       <source
         type="image/avif"
-        srcSet="/assets/milkyboss-emblem-1x.avif 1x, /assets/milkyboss-emblem-2x.avif 2x"
+        srcSet={`${resolveAssetUrl('/assets/milkyboss-emblem-1x.avif')} 1x, ${resolveAssetUrl('/assets/milkyboss-emblem-2x.avif')} 2x`}
       />
       <source
         type="image/webp"
-        srcSet="/assets/milkyboss-emblem-1x.webp 1x, /assets/milkyboss-emblem-2x.webp 2x"
+        srcSet={`${resolveAssetUrl('/assets/milkyboss-emblem-1x.webp')} 1x, ${resolveAssetUrl('/assets/milkyboss-emblem-2x.webp')} 2x`}
       />
       <img
-        src="/assets/milkyboss-emblem-1x.webp"
+        src={resolveAssetUrl('/assets/milkyboss-emblem-1x.webp')}
         alt="Milky BOSS Agency Emblem"
         width="307"
         height="168"
@@ -55,7 +56,7 @@ export const MilkyBossLogo: React.FC<MilkyBossLogoProps> = ({
     return (
       <div className={`inline-flex items-center shrink-0 ${className}`}>
         <img
-          src="/assets/milkyboss-dog-icon-squircle.png"
+          src={resolveAssetUrl('/assets/milkyboss-dog-icon-squircle.png')}
           alt="Milky BOSS Agency"
           width="128"
           height="128"

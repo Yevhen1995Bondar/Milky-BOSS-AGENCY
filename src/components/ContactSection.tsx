@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { validateContactForm } from '../utils/pricing';
+import { buildSanitizedInquiryPayload } from '../utils/inquiryValidation';
 import { ContactFormData, FormErrors } from '../types';
 import { CONTACT_EMAIL, CONTACT_PHONE, LOCATION_CITY } from '../data/content';
-import { Mail, Phone, MapPin, Send, Clock, ShieldCheck, X } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Clock, ShieldCheck, X, AlertCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { useFirebase } from '../context/FirebaseContext';
+import { db, handleFirestoreError, OperationType } from '../firebase';
 
 interface ContactSectionProps {
   prefilledService?: string;
@@ -16,6 +20,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   prefilledMessage = '',
 }) => {
   const { dict, language } = useLanguage();
+  const { user } = useFirebase();
   const c = dict.contact;
 
   const [formData, setFormData] = useState<ContactFormData>({
@@ -31,6 +36,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [referenceId, setReferenceId] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [showToast, setShowToast] = useState<boolean>(false);
@@ -58,7 +65,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     }
   }, [prefilledMessage]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const validation = validateContactForm(formData);
 
@@ -68,14 +75,32 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     }
 
     setErrors({});
+    setSubmitError(null);
     setIsSubmitting(true);
 
-    // Simulate reliable dispatch with subtle animations
-    setTimeout(() => {
-      setIsSubmitting(false);
+    const inquiryRef = doc(collection(db, 'inquiries'));
+    const path = `inquiries/${inquiryRef.id}`;
+
+    try {
+      const payload = buildSanitizedInquiryPayload(formData, language, user?.uid);
+      await setDoc(inquiryRef, {
+        ...payload,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      setReferenceId(inquiryRef.id);
       setIsSuccess(true);
       setShowToast(true);
-    }, 700);
+    } catch (error) {
+      setSubmitError(c.submit_error);
+      try {
+        handleFirestoreError(error, OperationType.CREATE, path);
+      } catch {
+        // Error already logged with structured context via handleFirestoreError; keep inline UI message visible
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -253,6 +278,9 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   </div>
 
                   <div className="p-4 rounded-xl bg-white/[0.03] border border-white/5 max-w-md mx-auto text-left text-xs text-zinc-400 space-y-1">
+                    {referenceId && (
+                      <div><span className="text-zinc-200">{c.reference_id}</span> <span className="font-mono text-emerald-400">{referenceId}</span></div>
+                    )}
                     <div><span className="text-zinc-200">{language === 'de' ? 'Name:' : 'Name:'}</span> {formData.name}</div>
                     <div><span className="text-zinc-200">{language === 'de' ? 'E-Mail:' : 'Email:'}</span> {formData.email}</div>
                     {formData.phone && <div><span className="text-zinc-200">{language === 'de' ? 'Telefon:' : 'Phone:'}</span> {formData.phone}</div>}
@@ -262,10 +290,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   <button
                     onClick={() => {
                       setIsSuccess(false);
+                      setReferenceId('');
                       setFormData({
-                        service: 'Shopify E-Commerce Pro',
+                        service: 'Shopify Onlineshop (Neubau oder Relaunch)',
                         budget: language === 'de' ? '3.000 € – 6.000 €' : '€3,000 – €6,000',
-                        timeline: language === 'de' ? 'Schnellstmöglich' : 'ASAP',
+                        timeline: language === 'de' ? 'Schnellstmöglich (in 2–4 Wochen)' : 'ASAP (within 2–4 weeks)',
                         name: '',
                         email: '',
                         phone: '',
@@ -287,10 +316,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
                   {/* Service Selection */}
                   <div>
-                    <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
+                    <label htmlFor="contact-service" className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
                       {c.service_label}
                     </label>
                     <select
+                      id="contact-service"
                       value={formData.service}
                       onChange={(e) => setFormData({ ...formData, service: e.target.value })}
                       className="w-full bg-[#181c26] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#c81e32]"
@@ -322,10 +352,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   {/* Budget & Timeline Grid */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
+                      <label htmlFor="contact-budget" className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
                         {c.budget_label}:
                       </label>
                       <select
+                        id="contact-budget"
                         value={formData.budget}
                         onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
                         className="w-full bg-[#181c26] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#c81e32]"
@@ -338,10 +369,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                     </div>
 
                     <div>
-                      <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
+                      <label htmlFor="contact-timeline" className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
                         {c.timeline_label}:
                       </label>
                       <select
+                        id="contact-timeline"
                         value={formData.timeline}
                         onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
                         className="w-full bg-[#181c26] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#c81e32]"
@@ -365,11 +397,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   {/* Name & Email */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
+                      <label htmlFor="contact-name" className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
                         {c.name_label}
                       </label>
                       <input
+                        id="contact-name"
                         type="text"
+                        maxLength={120}
                         placeholder={c.name_placeholder}
                         value={formData.name}
                         onChange={(e) => {
@@ -384,11 +418,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                     </div>
 
                     <div>
-                      <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
+                      <label htmlFor="contact-email" className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
                         {c.email_label}
                       </label>
                       <input
+                        id="contact-email"
                         type="email"
+                        maxLength={160}
                         placeholder={c.email_placeholder}
                         value={formData.email}
                         onChange={(e) => {
@@ -406,11 +442,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                   {/* Phone & Company */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
+                      <label htmlFor="contact-phone" className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
                         {c.phone_label}
                       </label>
                       <input
+                        id="contact-phone"
                         type="tel"
+                        maxLength={40}
                         placeholder={c.phone_placeholder}
                         value={formData.phone}
                         onChange={(e) => {
@@ -425,11 +463,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                     </div>
 
                     <div>
-                      <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
+                      <label htmlFor="contact-company" className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
                         {c.company_label}
                       </label>
                       <input
+                        id="contact-company"
                         type="text"
+                        maxLength={160}
                         placeholder={c.company_placeholder}
                         value={formData.company}
                         onChange={(e) => setFormData({ ...formData, company: e.target.value })}
@@ -440,11 +480,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
                   {/* Message */}
                   <div>
-                    <label className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
+                    <label htmlFor="contact-message" className="text-xs font-semibold uppercase tracking-wider text-zinc-300 block mb-2">
                       {c.message_label}
                     </label>
                     <textarea
+                      id="contact-message"
                       rows={4}
+                      maxLength={4000}
                       placeholder={c.message_placeholder}
                       value={formData.message}
                       onChange={(e) => {
@@ -471,6 +513,13 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       {c.crm_checkbox}
                     </label>
                   </div>
+
+                  {submitError && (
+                    <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-xs text-red-300 flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 shrink-0" />
+                      <span>{submitError}</span>
+                    </div>
+                  )}
 
                   {/* Submit Button */}
                   <div className="pt-2">

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, CheckCircle, ArrowRight, MapPin, Calendar, Clock, ExternalLink, FileText } from 'lucide-react';
 import { ProjectCaseStudy } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { resolveAssetUrl } from '../utils/assets';
 
 interface ProjectModalProps {
   project: ProjectCaseStudy | null;
@@ -84,7 +85,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
               <div className="flex flex-wrap items-center gap-2 shrink-0 self-start sm:self-auto">
                 {project.pdfUrl && (
                   <a
-                    href={project.pdfUrl}
+                    href={resolveAssetUrl(project.pdfUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-[#c81e32] to-[#e5253e] hover:from-[#b01829] hover:to-[#c81e32] text-white text-xs font-bold uppercase tracking-wider shadow-lg shadow-[#c81e32]/30 transition-all cursor-pointer"
@@ -113,7 +114,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
             {/* Visual Media Showcase */}
             <div className="relative rounded-xl overflow-hidden border border-white/10 bg-black aspect-[16/9] max-h-96">
               <img
-                src={project.image}
+                src={resolveAssetUrl(project.image)}
                 alt={project.title}
                 className="w-full h-full object-cover object-center"
                 referrerPolicy="no-referrer"
@@ -171,7 +172,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
                 </h4>
                 <div className="relative rounded-xl overflow-hidden border border-white/10 bg-black aspect-[16/9] max-h-96 group shadow-lg">
                   <img
-                    src={project.metricsImage}
+                    src={resolveAssetUrl(project.metricsImage)}
                     alt="60-Tage Performance Report"
                     className="w-full h-full object-cover object-center group-hover:scale-102 transition-transform duration-300"
                     loading="lazy"

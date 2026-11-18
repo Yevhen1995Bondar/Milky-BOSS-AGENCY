@@ -4,6 +4,7 @@ import { ProjectCaseStudy } from '../types';
 import { ArrowUpRight, ExternalLink, FileText } from 'lucide-react';
 import { ProjectModal } from './ProjectModal';
 import { useLanguage } from '../context/LanguageContext';
+import { resolveAssetUrl } from '../utils/assets';
 
 interface PortfolioSectionProps {
   onRequestProject: (projectTitle: string) => void;
@@ -77,7 +78,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onRequestPro
               {/* Thumbnail Image */}
               <div className="relative h-56 overflow-hidden bg-zinc-900">
                 <img
-                  src={project.image}
+                  src={resolveAssetUrl(project.image)}
                   alt={project.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-85 group-hover:opacity-100"
                   loading="lazy"
@@ -103,7 +104,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onRequestPro
                   )}
                   {project.pdfUrl && (
                     <a
-                      href={project.pdfUrl}
+                      href={resolveAssetUrl(project.pdfUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={(e) => e.stopPropagation()}
@@ -171,7 +172,7 @@ export const PortfolioSection: React.FC<PortfolioSectionProps> = ({ onRequestPro
                       )}
                       {project.pdfUrl && (
                         <a
-                          href={project.pdfUrl}
+                          href={resolveAssetUrl(project.pdfUrl)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs px-2.5 py-1.5 rounded bg-[#c81e32]/20 hover:bg-[#c81e32] text-white border border-[#c81e32]/40 transition-colors inline-flex items-center gap-1 font-medium"

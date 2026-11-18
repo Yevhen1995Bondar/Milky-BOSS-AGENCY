@@ -1,0 +1,197 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated user account profile without PII (email isolated in private subcollection).",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the user",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Display name from Google profile",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "photoURL": {
+          "type": "string",
+          "description": "Avatar URL or empty string",
+          "maxLength": 500
+        },
+        "role": {
+          "type": "string",
+          "description": "Authorization role assigned to user",
+          "enum": ["client", "admin"]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last update timestamp"
+        }
+      },
+      "required": ["uid", "displayName", "photoURL", "role", "createdAt", "updatedAt"]
+    },
+    "UserPrivateInfo": {
+      "title": "UserPrivateInfo",
+      "description": "Isolated PII record for a user account.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the owner",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "description": "Verified email address",
+          "minLength": 5,
+          "maxLength": 160,
+          "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last update timestamp"
+        }
+      },
+      "required": ["uid", "email", "updatedAt"]
+    },
+    "ProjectInquiry": {
+      "title": "ProjectInquiry",
+      "description": "Agency project inquiry submitted via the Milky BOSS contact form.",
+      "type": "object",
+      "properties": {
+        "requestedService": {
+          "type": "string",
+          "description": "Selected primary agency service or package",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "budget": {
+          "type": "string",
+          "description": "Selected project budget range",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "timeline": {
+          "type": "string",
+          "description": "Desired launch timeline",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "name": {
+          "type": "string",
+          "description": "Client full name",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "email": {
+          "type": "string",
+          "description": "Client business email",
+          "minLength": 5,
+          "maxLength": 160,
+          "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Optional client phone number",
+          "maxLength": 40
+        },
+        "company": {
+          "type": "string",
+          "description": "Optional company or website name",
+          "maxLength": 160
+        },
+        "message": {
+          "type": "string",
+          "description": "Project brief and objectives",
+          "minLength": 10,
+          "maxLength": 4000
+        },
+        "crmInterest": {
+          "type": "boolean",
+          "description": "Whether the client opted into Google AI Studio & CRM workflow consulting"
+        },
+        "language": {
+          "type": "string",
+          "description": "UI language at time of submission",
+          "enum": ["de", "en"]
+        },
+        "status": {
+          "type": "string",
+          "description": "Lifecycle status of the project inquiry",
+          "enum": ["new", "in_review", "contacted", "archived"]
+        },
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID if signed in when submitting, otherwise empty string",
+          "maxLength": 128
+        },
+        "adminNote": {
+          "type": "string",
+          "description": "Internal agency assessment note (admin only)",
+          "maxLength": 2000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last update timestamp"
+        }
+      },
+      "required": [
+        "requestedService",
+        "budget",
+        "timeline",
+        "name",
+        "email",
+        "phone",
+        "company",
+        "message",
+        "crmInterest",
+        "language",
+        "status",
+        "userId",
+        "adminNote",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "User profile records keyed by Firebase Auth UID (no PII)."
+    },
+    "/users/{userId}/private/info": {
+      "schema": {
+        "$ref": "#/entities/UserPrivateInfo"
+      },
+      "description": "Private PII subcollection document storing user email address."
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": {
+        "$ref": "#/entities/ProjectInquiry"
+      },
+      "description": "Submitted client project inquiries and agency lead pipeline."
+    }
+  }
+}

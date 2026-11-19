@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ShoppingBag, Target, BarChart3, Bot, Check, ArrowRight, Megaphone, Share2, Compass } from 'lucide-react';
 import { ServiceItem } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { EditableText } from './EditableText';
 
 interface ServicesSectionProps {
   onSelectService: (serviceTitle: string) => void;
@@ -38,15 +39,28 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="max-w-3xl">
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]">
-            {dict.services_section.tag}
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight">
-            {dict.services_section.heading}
-          </h2>
-          <p className="text-zinc-400 mt-4 text-base sm:text-lg leading-relaxed">
-            {dict.services_section.subtext}
-          </p>
+          <EditableText
+            as="div"
+            contentKey="services.tag"
+            defaultValue={dict.services_section.tag}
+            label="Тег секции услуг"
+            className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]"
+          />
+          <EditableText
+            as="h2"
+            contentKey="services.heading"
+            defaultValue={dict.services_section.heading}
+            label="Заголовок секции услуг"
+            className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight"
+          />
+          <EditableText
+            as="p"
+            contentKey="services.subtext"
+            defaultValue={dict.services_section.subtext}
+            multiline
+            label="Подзаголовок секции услуг"
+            className="text-zinc-400 mt-4 text-base sm:text-lg leading-relaxed block"
+          />
         </div>
 
         {/* Interactive Service Switcher & Bento Presentation */}
@@ -83,16 +97,23 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
                         {service.number}
                       </span>
                     </div>
-                    <div
-                      className={`text-base font-semibold mt-1 transition-colors ${
+                    <EditableText
+                      as="div"
+                      contentKey={`service.${service.id}.title`}
+                      defaultValue={service.title}
+                      label={`Название услуги ${service.number}`}
+                      className={`text-base font-semibold mt-1 transition-colors block ${
                         isActive ? 'text-white' : 'text-zinc-200'
                       }`}
-                    >
-                      {service.title}
-                    </div>
-                    <p className="text-xs text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
-                      {service.shortDescription}
-                    </p>
+                    />
+                    <EditableText
+                      as="p"
+                      contentKey={`service.${service.id}.shortDesc`}
+                      defaultValue={service.shortDescription}
+                      multiline
+                      label={`Краткое описание услуги ${service.number}`}
+                      className="text-xs text-zinc-400 mt-1 line-clamp-2 leading-relaxed block"
+                    />
                   </div>
                 </button>
               );
@@ -113,16 +134,29 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
                 {/* Metric Highlight Header */}
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#c81e32]/10 border border-[#c81e32]/30 text-xs font-semibold text-[#ff3852] mb-6">
                   <span>●</span>
-                  <span>{activeService.metricsHighlight}</span>
+                  <EditableText
+                    contentKey={`service.${activeService.id}.metrics`}
+                    defaultValue={activeService.metricsHighlight}
+                    label="Метрика услуги"
+                  />
                 </div>
 
                 <div>
-                  <h3 className="text-2xl sm:text-3xl font-bold font-display text-white mb-4">
-                    {activeService.title}
-                  </h3>
-                  <p className="text-zinc-300 leading-relaxed text-base">
-                    {activeService.fullDescription}
-                  </p>
+                  <EditableText
+                    as="h3"
+                    contentKey={`service.${activeService.id}.title`}
+                    defaultValue={activeService.title}
+                    label={`Заголовок услуги ${activeService.number}`}
+                    className="text-2xl sm:text-3xl font-bold font-display text-white mb-4 block"
+                  />
+                  <EditableText
+                    as="p"
+                    contentKey={`service.${activeService.id}.fullDesc`}
+                    defaultValue={activeService.fullDescription}
+                    multiline
+                    label={`Полное описание услуги ${activeService.number}`}
+                    className="text-zinc-300 leading-relaxed text-base block"
+                  />
                 </div>
 
                 {/* Deliverables */}
@@ -134,7 +168,11 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
                     {activeService.deliverables.map((item, idx) => (
                       <div key={idx} className="flex items-start gap-2.5 text-sm text-zinc-200">
                         <Check className="w-4 h-4 text-[#c81e32] shrink-0 mt-0.5" />
-                        <span>{item}</span>
+                        <EditableText
+                          contentKey={`service.${activeService.id}.deliv.${idx}`}
+                          defaultValue={item}
+                          label={`Пункт услуги ${activeService.number} #${idx + 1}`}
+                        />
                       </div>
                     ))}
                   </div>

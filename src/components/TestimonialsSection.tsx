@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, type Variants } from 'motion/react';
 import { ChevronLeft, ChevronRight, Star, Quote, Pause, Play, TrendingUp } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { EditableText } from './EditableText';
 
 export const TestimonialsSection: React.FC = () => {
   const { testimonials, dict, language } = useLanguage();
@@ -77,15 +78,28 @@ export const TestimonialsSection: React.FC = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto">
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]">
-            {dict.testimonials.tag}
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight">
-            {dict.testimonials.heading}
-          </h2>
-          <p className="text-zinc-400 mt-3 text-base">
-            {dict.testimonials.subtext}
-          </p>
+          <EditableText
+            as="div"
+            contentKey="testimonials.tag"
+            defaultValue={dict.testimonials.tag}
+            label="Тег отзывов"
+            className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]"
+          />
+          <EditableText
+            as="h2"
+            contentKey="testimonials.heading"
+            defaultValue={dict.testimonials.heading}
+            label="Заголовок отзывов"
+            className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight"
+          />
+          <EditableText
+            as="p"
+            contentKey="testimonials.subtext"
+            defaultValue={dict.testimonials.subtext}
+            multiline
+            label="Подзаголовок отзывов"
+            className="text-zinc-400 mt-3 text-base block"
+          />
         </div>
 
         {/* Testimonial Slider Card */}
@@ -107,7 +121,11 @@ export const TestimonialsSection: React.FC = () => {
               {/* Metric tag */}
               <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold font-mono">
                 <TrendingUp className="w-3.5 h-3.5" />
-                <span>{current.metricsResult}</span>
+                <EditableText
+                  contentKey={`testimonial.${current.id}.metric`}
+                  defaultValue={current.metricsResult}
+                  label="Метрика отзыва"
+                />
               </div>
             </div>
 
@@ -124,22 +142,50 @@ export const TestimonialsSection: React.FC = () => {
                   className="w-full space-y-4"
                 >
                   <p className="text-lg sm:text-xl md:text-2xl font-medium text-zinc-100 leading-relaxed font-display">
-                    &bdquo;{current.quote}&ldquo;
+                    &bdquo;
+                    <EditableText
+                      contentKey={`testimonial.${current.id}.quote`}
+                      defaultValue={current.quote}
+                      multiline
+                      label="Текст отзыва"
+                    />
+                    &ldquo;
                   </p>
 
                   <div className="pt-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-t border-white/5">
                     <div>
-                      <div className="text-base font-bold text-white font-display">
-                        {current.name}
-                      </div>
+                      <EditableText
+                        as="div"
+                        contentKey={`testimonial.${current.id}.name`}
+                        defaultValue={current.name}
+                        shared
+                        label="Имя автора отзыва"
+                        className="text-base font-bold text-white font-display"
+                      />
                       <div className="text-xs text-zinc-400">
-                        {current.role} · <span className="text-zinc-200">{current.company}</span>
+                        <EditableText
+                          contentKey={`testimonial.${current.id}.role`}
+                          defaultValue={current.role}
+                          label="Должность автора"
+                        />{' '}
+                        ·{' '}
+                        <EditableText
+                          contentKey={`testimonial.${current.id}.company`}
+                          defaultValue={current.company}
+                          shared
+                          label="Компания автора"
+                          className="text-zinc-200"
+                        />
                       </div>
                     </div>
 
-                    <div className="text-xs font-mono text-[#c81e32] font-semibold bg-[#c81e32]/10 px-2.5 py-1 rounded-md self-start sm:self-auto">
-                      {current.projectType}
-                    </div>
+                    <EditableText
+                      as="div"
+                      contentKey={`testimonial.${current.id}.projectType`}
+                      defaultValue={current.projectType}
+                      label="Тип проекта в отзыве"
+                      className="text-xs font-mono text-[#c81e32] font-semibold bg-[#c81e32]/10 px-2.5 py-1 rounded-md self-start sm:self-auto"
+                    />
                   </div>
                 </motion.div>
               </AnimatePresence>

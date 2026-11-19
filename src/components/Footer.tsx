@@ -1,13 +1,20 @@
 import React, { useState } from 'react';
 import { CONTACT_EMAIL, CONTACT_PHONE, LOCATION_CITY } from '../data/content';
-import { X } from 'lucide-react';
+import { Lock, X } from 'lucide-react';
 import { MilkyBossLogo } from './MilkyBossLogo';
 import { useLanguage } from '../context/LanguageContext';
+import { useCms } from '../context/CmsContext';
+import { EditableText } from './EditableText';
 
 export const Footer: React.FC = () => {
   const [legalModal, setLegalModal] = useState<'imprint' | 'privacy' | null>(null);
   const { dict, language } = useLanguage();
+  const { getText, openAdminModal } = useCms();
   const f = dict.footer;
+
+  const email = getText('contact.email', CONTACT_EMAIL, true);
+  const phone = getText('contact.phone', CONTACT_PHONE, true);
+  const addressDefault = `MediaPark / Ehrenfeld, 50672 ${LOCATION_CITY}`;
 
   return (
     <footer className="bg-[#07080c] border-t border-white/10 text-zinc-400 text-xs">
@@ -18,11 +25,22 @@ export const Footer: React.FC = () => {
             <a href="#" className="inline-flex items-center group" aria-label="Milky BOSS Agency Home">
               <MilkyBossLogo size="md" />
             </a>
-            <p className="text-zinc-400 max-w-sm leading-relaxed">
-              {f.desc}
-            </p>
+            <EditableText
+              as="p"
+              contentKey="footer.desc"
+              defaultValue={f.desc}
+              multiline
+              label="Описание в футере"
+              className="text-zinc-400 max-w-sm leading-relaxed block"
+            />
             <div className="text-zinc-400">
-              {language === 'de' ? 'Standort:' : 'Location:'} MediaPark / Ehrenfeld, 50672 {LOCATION_CITY}
+              {language === 'de' ? 'Standort:' : 'Location:'}{' '}
+              <EditableText
+                contentKey="contact.address"
+                defaultValue={addressDefault}
+                shared
+                label="Адрес офиса"
+              />
             </div>
           </div>
 
@@ -68,14 +86,24 @@ export const Footer: React.FC = () => {
             <div className="space-y-2 text-zinc-300">
               <div>
                 {language === 'de' ? 'E-Mail:' : 'Email:'}{' '}
-                <a href={`mailto:${CONTACT_EMAIL}`} className="text-white hover:underline">
-                  {CONTACT_EMAIL}
+                <a href={`mailto:${email}`} className="text-white hover:underline">
+                  <EditableText
+                    contentKey="contact.email"
+                    defaultValue={CONTACT_EMAIL}
+                    shared
+                    label="Email агентства"
+                  />
                 </a>
               </div>
               <div>
                 {language === 'de' ? 'Telefon:' : 'Phone:'}{' '}
-                <a href={`tel:${CONTACT_PHONE.replace(/\s+/g, '')}`} className="text-white hover:underline">
-                  {CONTACT_PHONE}
+                <a href={`tel:${phone.replace(/\s+/g, '')}`} className="text-white hover:underline">
+                  <EditableText
+                    contentKey="contact.phone"
+                    defaultValue={CONTACT_PHONE}
+                    shared
+                    label="Телефон агентства"
+                  />
                 </a>
               </div>
               <div className="text-zinc-400 text-[11px] pt-1">
@@ -90,7 +118,8 @@ export const Footer: React.FC = () => {
         {/* Bottom Legal Bar */}
         <div className="mt-12 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-zinc-400 text-[11px]">
-            &copy; {new Date().getFullYear()} Milky BOSS Agency. {f.rights}
+            &copy; {new Date().getFullYear()} Milky BOSS Agency.{' '}
+            <EditableText contentKey="footer.rights" defaultValue={f.rights} label="Права в футере" />
           </div>
           <div className="flex items-center gap-6 text-[11px]">
             <button
@@ -108,6 +137,15 @@ export const Footer: React.FC = () => {
             <a href="#services" className="hover:text-white transition-colors">
               {language === 'de' ? 'Nach oben ↑' : 'Back to top ↑'}
             </a>
+            <button
+              type="button"
+              onClick={() => openAdminModal('leads')}
+              aria-label="Admin"
+              title="Admin (#admin)"
+              className="p-1 text-zinc-600 hover:text-zinc-300 opacity-60 hover:opacity-100 transition-all cursor-pointer"
+            >
+              <Lock className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </div>
@@ -140,8 +178,8 @@ export const Footer: React.FC = () => {
                   </p>
                   <p>
                     <strong>{language === 'de' ? 'Kontakt:' : 'Contact:'}</strong><br />
-                    Telefon: {CONTACT_PHONE}<br />
-                    E-Mail: {CONTACT_EMAIL}
+                    Telefon: {phone}<br />
+                    E-Mail: {email}
                   </p>
                   <p>
                     <strong>Verantwortlich für den Inhalt:</strong><br />

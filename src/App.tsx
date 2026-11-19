@@ -14,9 +14,12 @@ import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { PagePreloader } from './components/PagePreloader';
 import { PortalModal } from './components/PortalModal';
+import { AdminBar } from './components/AdminBar';
+import { AdminModal } from './components/AdminModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { FirebaseProvider } from './context/FirebaseContext';
+import { CmsProvider } from './context/CmsContext';
 
 // Reusable viewport-triggered reveal container with Framer Motion
 interface SectionRevealProps {
@@ -97,6 +100,9 @@ function MainApplication() {
       {/* Global Scroll Progress Indicator at very top */}
       <ScrollProgressBar />
 
+      {/* Compact Top Admin Bar (shown only when signed in as teams@milkyboss.de) */}
+      <AdminBar />
+
       {/* Top Navbar with Language Switcher */}
       <Navbar
         onOpenContact={scrollToContact}
@@ -167,6 +173,9 @@ function MainApplication() {
         onClose={() => setPortalOpen(false)}
         onNewInquiry={scrollToContact}
       />
+
+      {/* Admin Auth & Leads Management Modal (#admin) */}
+      <AdminModal />
     </div>
   );
 }
@@ -176,7 +185,9 @@ export default function App() {
     <ErrorBoundary>
       <FirebaseProvider>
         <LanguageProvider>
-          <MainApplication />
+          <CmsProvider>
+            <MainApplication />
+          </CmsProvider>
         </LanguageProvider>
       </FirebaseProvider>
     </ErrorBoundary>

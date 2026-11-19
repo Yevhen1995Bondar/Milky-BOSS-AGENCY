@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, CheckCircle, ArrowRight, MapPin, Calendar, Clock, ExternalLink, FileText } from 'lucide-react';
 import { ProjectCaseStudy } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { useCms } from '../context/CmsContext';
 import { resolveAssetUrl } from '../utils/assets';
 
 interface ProjectModalProps {
@@ -17,7 +18,11 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
   onRequestSimilar,
 }) => {
   const { language } = useLanguage();
+  const { getText } = useCms();
   if (!project) return null;
+
+  const displayTitle = getText(`project.${project.id}.title`, project.title);
+  const displayImage = getText(`project.${project.id}.image`, project.image, true);
 
   return (
     <AnimatePresence>
@@ -62,7 +67,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
             <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
               <div>
                 <h3 className="text-2xl sm:text-3xl font-bold font-display text-white">
-                  {project.title}
+                  {displayTitle}
                 </h3>
                 <div className="flex flex-wrap items-center gap-4 mt-3 text-xs text-zinc-400">
                   <span className="flex items-center gap-1.5">
@@ -114,8 +119,8 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
             {/* Visual Media Showcase */}
             <div className="relative rounded-xl overflow-hidden border border-white/10 bg-black aspect-[16/9] max-h-96">
               <img
-                src={resolveAssetUrl(project.image)}
-                alt={project.title}
+                src={resolveAssetUrl(displayImage)}
+                alt={displayTitle}
                 className="w-full h-full object-cover object-center"
                 referrerPolicy="no-referrer"
                 onError={(e) => {

@@ -70,7 +70,7 @@
     },
     "ProjectInquiry": {
       "title": "ProjectInquiry",
-      "description": "Agency project inquiry submitted via the Milky BOSS contact form.",
+      "description": "Legacy agency project inquiry submitted via the Milky BOSS contact form.",
       "type": "object",
       "properties": {
         "requestedService": {
@@ -172,6 +172,135 @@
         "createdAt",
         "updatedAt"
       ]
+    },
+    "Lead": {
+      "title": "Lead",
+      "description": "Client lead submitted from website contact/inquiry forms.",
+      "type": "object",
+      "properties": {
+        "requestedService": {
+          "type": "string",
+          "description": "Selected primary agency service or package",
+          "minLength": 1,
+          "maxLength": 160
+        },
+        "budget": {
+          "type": "string",
+          "description": "Selected project budget range",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "timeline": {
+          "type": "string",
+          "description": "Desired launch timeline",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "name": {
+          "type": "string",
+          "description": "Lead full name",
+          "minLength": 2,
+          "maxLength": 120
+        },
+        "email": {
+          "type": "string",
+          "description": "Lead email address",
+          "minLength": 5,
+          "maxLength": 160,
+          "pattern": "^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Lead phone number",
+          "maxLength": 40
+        },
+        "company": {
+          "type": "string",
+          "description": "Optional company or website",
+          "maxLength": 160
+        },
+        "message": {
+          "type": "string",
+          "description": "Lead inquiry message",
+          "minLength": 10,
+          "maxLength": 4000
+        },
+        "crmInterest": {
+          "type": "boolean",
+          "description": "Whether lead requested Google AI Studio CRM automation"
+        },
+        "language": {
+          "type": "string",
+          "description": "UI language at time of submission",
+          "enum": ["de", "en"]
+        },
+        "status": {
+          "type": "string",
+          "description": "CRM lead status",
+          "enum": ["Новая", "В работе", "Закрыта"]
+        },
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth UID if signed in when submitting, otherwise empty string",
+          "maxLength": 128
+        },
+        "adminNote": {
+          "type": "string",
+          "description": "Internal agency note (admin only)",
+          "maxLength": 2000
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last update timestamp"
+        }
+      },
+      "required": [
+        "requestedService",
+        "budget",
+        "timeline",
+        "name",
+        "email",
+        "phone",
+        "company",
+        "message",
+        "crmInterest",
+        "language",
+        "status",
+        "userId",
+        "adminNote",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "SiteContent": {
+      "title": "SiteContent",
+      "description": "Published visual CMS overrides for texts, prices, contacts, and images.",
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "object",
+          "description": "Flat map of editable content key -> string value (max 500 entries, values up to 4000 chars)"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server last publish timestamp"
+        },
+        "updatedBy": {
+          "type": "string",
+          "description": "Admin Firebase Auth UID who last published changes",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        }
+      },
+      "required": ["fields", "updatedAt", "updatedBy"]
     }
   },
   "firestore": {
@@ -191,7 +320,19 @@
       "schema": {
         "$ref": "#/entities/ProjectInquiry"
       },
-      "description": "Submitted client project inquiries and agency lead pipeline."
+      "description": "Legacy project inquiries collection."
+    },
+    "/leads/{leadId}": {
+      "schema": {
+        "$ref": "#/entities/Lead"
+      },
+      "description": "Submitted website leads and admin CRM pipeline."
+    },
+    "/site_content/{docId}": {
+      "schema": {
+        "$ref": "#/entities/SiteContent"
+      },
+      "description": "Live visual CMS content document ('main') readable by all visitors and writable only by verified admin."
     }
   }
 }

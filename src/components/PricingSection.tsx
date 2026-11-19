@@ -4,6 +4,7 @@ import { calculateProjectEstimate } from '../utils/pricing';
 import { Check, ArrowRight, Sliders, ShieldCheck } from 'lucide-react';
 import { PricingPlan } from '../types';
 import { useLanguage } from '../context/LanguageContext';
+import { EditableText } from './EditableText';
 
 interface PricingSectionProps {
   onSelectPlan: (planName: string, estimateDetails?: string) => void;
@@ -91,15 +92,28 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto">
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]">
-            {dict.pricing.tag}
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight">
-            {dict.pricing.heading}
-          </h2>
-          <p className="text-zinc-400 mt-3 text-base sm:text-lg">
-            {dict.pricing.subtext}
-          </p>
+          <EditableText
+            as="div"
+            contentKey="pricing.tag"
+            defaultValue={dict.pricing.tag}
+            label="Тег секции цен"
+            className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]"
+          />
+          <EditableText
+            as="h2"
+            contentKey="pricing.heading"
+            defaultValue={dict.pricing.heading}
+            label="Заголовок секции цен"
+            className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight"
+          />
+          <EditableText
+            as="p"
+            contentKey="pricing.subtext"
+            defaultValue={dict.pricing.subtext}
+            multiline
+            label="Подзаголовок секции цен"
+            className="text-zinc-400 mt-3 text-base sm:text-lg block"
+          />
         </div>
 
         {/* 3 Core Package Cards */}
@@ -125,34 +139,67 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
 
                 <div>
                   <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold font-display text-white">{plan.name}</h3>
+                    <EditableText
+                      as="h3"
+                      contentKey={`pricing.plan.${plan.id}.name`}
+                      defaultValue={plan.name}
+                      label={`Название тарифа ${plan.id}`}
+                      className="text-xl font-bold font-display text-white"
+                    />
                   </div>
-                  <p className="text-xs text-zinc-400 mt-1">{plan.subtitle}</p>
+                  <EditableText
+                    as="p"
+                    contentKey={`pricing.plan.${plan.id}.subtitle`}
+                    defaultValue={plan.subtitle}
+                    label={`Подзаголовок тарифа ${plan.id}`}
+                    className="text-xs text-zinc-400 mt-1 block"
+                  />
 
                   <div className="mt-6 flex items-baseline gap-2">
-                    <span className="text-4xl font-bold font-display text-white tabular-nums tracking-tight">
-                      {plan.price}
-                    </span>
+                    <EditableText
+                      contentKey={`pricing.plan.${plan.id}.price`}
+                      defaultValue={plan.price}
+                      shared
+                      label={`Цена тарифа ${plan.name}`}
+                      className="text-4xl font-bold font-display text-white tabular-nums tracking-tight"
+                    />
                     <span className="text-xs text-zinc-400">
                       {language === 'de' ? 'zzgl. MwSt.' : 'excl. VAT'}
                     </span>
                   </div>
 
-                  <div className="mt-2 text-xs font-mono text-zinc-400">{plan.deliveryTime}</div>
+                  <EditableText
+                    as="div"
+                    contentKey={`pricing.plan.${plan.id}.delivery`}
+                    defaultValue={plan.deliveryTime}
+                    label={`Срок тарифа ${plan.name}`}
+                    className="mt-2 text-xs font-mono text-zinc-400"
+                  />
 
                   {/* Feature Checklist */}
                   <div className="mt-8 space-y-3.5 pt-6 border-t border-white/10">
                     {plan.features.map((feat, idx) => (
                       <div key={idx} className="flex items-start gap-2.5 text-xs text-zinc-300">
                         <Check className="w-4 h-4 text-[#c81e32] shrink-0 mt-0.5" />
-                        <span>{feat}</span>
+                        <EditableText
+                          contentKey={`pricing.plan.${plan.id}.feat.${idx}`}
+                          defaultValue={feat}
+                          label={`Пункт тарифа ${plan.name} #${idx + 1}`}
+                        />
                       </div>
                     ))}
                   </div>
                 </div>
 
                 <div className="mt-8 pt-6 border-t border-white/10">
-                  <div className="text-[11px] text-zinc-400 mb-4">{plan.suitableFor}</div>
+                  <EditableText
+                    as="div"
+                    contentKey={`pricing.plan.${plan.id}.suitable`}
+                    defaultValue={plan.suitableFor}
+                    multiline
+                    label={`Кому подходит тариф ${plan.name}`}
+                    className="text-[11px] text-zinc-400 mb-4 block"
+                  />
                   <button
                     onClick={() => onSelectPlan(plan.name)}
                     className={`w-full py-3 px-4 rounded-md text-xs uppercase tracking-wider font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
@@ -181,11 +228,30 @@ export const PricingSection: React.FC<PricingSectionProps> = ({ onSelectPlan }) 
                 <span className="text-[10px] font-mono uppercase tracking-wider text-[#c81e32]">
                   {language === 'de' ? 'Monatliche Betreuung' : 'Monthly Retainer'}
                 </span>
-                <h4 className="text-base font-bold text-white font-display mt-0.5">{ret.name}</h4>
-                <p className="text-xs text-zinc-400 mt-1 max-w-md">{ret.description}</p>
+                <EditableText
+                  as="h4"
+                  contentKey={`pricing.retainer.${ret.id}.name`}
+                  defaultValue={ret.name}
+                  label={`Название ретейнера ${ret.id}`}
+                  className="text-base font-bold text-white font-display mt-0.5 block"
+                />
+                <EditableText
+                  as="p"
+                  contentKey={`pricing.retainer.${ret.id}.desc`}
+                  defaultValue={ret.description}
+                  multiline
+                  label={`Описание ретейнера ${ret.id}`}
+                  className="text-xs text-zinc-400 mt-1 max-w-md block"
+                />
               </div>
               <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto gap-2 shrink-0">
-                <span className="text-sm font-bold text-white font-mono">{ret.price}</span>
+                <EditableText
+                  contentKey={`pricing.retainer.${ret.id}.price`}
+                  defaultValue={ret.price}
+                  shared
+                  label={`Цена ретейнера ${ret.name}`}
+                  className="text-sm font-bold text-white font-mono"
+                />
                 <button
                   onClick={() => onSelectPlan(ret.name)}
                   className="text-xs px-3 py-1.5 rounded bg-white/5 hover:bg-[#c81e32] text-zinc-200 hover:text-white transition-colors cursor-pointer"

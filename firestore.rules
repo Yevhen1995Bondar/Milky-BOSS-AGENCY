@@ -98,6 +98,43 @@ service cloud.firestore {
         && data.updatedAt is timestamp;
     }
 
+    function isValidLead(data) {
+      return data.keys().hasAll([
+          'requestedService', 'budget', 'timeline', 'name', 'email',
+          'phone', 'company', 'message', 'crmInterest', 'language',
+          'status', 'userId', 'adminNote', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'requestedService', 'budget', 'timeline', 'name', 'email',
+          'phone', 'company', 'message', 'crmInterest', 'language',
+          'status', 'userId', 'adminNote', 'createdAt', 'updatedAt'
+        ])
+        && data.requestedService is string && data.requestedService.size() >= 1 && data.requestedService.size() <= 160
+        && data.budget is string && data.budget.size() >= 1 && data.budget.size() <= 80
+        && data.timeline is string && data.timeline.size() >= 1 && data.timeline.size() <= 100
+        && data.name is string && data.name.size() >= 2 && data.name.size() <= 120
+        && isValidEmail(data.email)
+        && data.phone is string && data.phone.size() <= 40
+        && data.company is string && data.company.size() <= 160
+        && data.message is string && data.message.size() >= 10 && data.message.size() <= 4000
+        && data.crmInterest is bool
+        && data.language in ['de', 'en']
+        && data.status in ['Новая', 'В работе', 'Закрыта']
+        && data.userId is string && data.userId.size() <= 128
+        && data.adminNote is string && data.adminNote.size() <= 2000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidSiteContent(data) {
+      return data.keys().hasAll(['fields', 'updatedAt', 'updatedBy'])
+        && data.keys().hasOnly(['fields', 'updatedAt', 'updatedBy'])
+        && data.fields is map
+        && data.fields.size() <= 500
+        && data.updatedAt is timestamp
+        && isValidId(data.updatedBy);
+    }
+
     // -------------------------------------------------------------------------
     // Collection Rules
     // -------------------------------------------------------------------------
@@ -164,7 +201,7 @@ service cloud.firestore {
       }
     }
 
-    // Project Inquiries (Lead Capture + Client Tracking + Agency Admin Management)
+    // Legacy Project Inquiries collection (kept protected)
     match /inquiries/{inquiryId} {
       allow get: if isSignedIn()
         && isValidId(inquiryId)
@@ -179,7 +216,6 @@ service cloud.firestore {
           (isEmailVerified() && resource.data.userId != '' && resource.data.userId == request.auth.uid)
         );
 
-      // Public agency lead capture OR signed-in client submission
       allow create: if isValidId(inquiryId)
         && isValidInquiry(incoming())
         && incoming().status == 'new'
@@ -191,7 +227,6 @@ service cloud.firestore {
           (isEmailVerified() && incoming().userId == request.auth.uid)
         );
 
-      // Action-Based Update Pattern (Admin triage / archiving only)
       allow update: if isAdmin()
         && isValidId(inquiryId)
         && isValidInquiry(incoming())
@@ -204,6 +239,71 @@ service cloud.firestore {
         && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminNote', 'updatedAt']);
 
       allow delete: if isAdmin() && isValidId(inquiryId);
+    }
+
+    // Active Leads Pipeline (Contact Form Capture + Admin Management & CSV Export)
+    match /leads/{leadId} {
+      allow get: if isSignedIn()
+        && isValidId(leadId)
+        && (
+          isAdmin() ||
+          (isEmailVerified() && existing().userId != '' && existing().userId == request.auth.uid)
+        );
+
+      allow list: if isSignedIn()
+        && (
+          isAdmin() ||
+          (isEmailVerified() && resource.data.userId != '' && resource.data.userId == request.auth.uid)
+        );
+
+      // Public lead capture OR signed-in client submission
+      allow create: if isValidId(leadId)
+        && isValidLead(incoming())
+        && incoming().status == 'Новая'
+        && incoming().adminNote == ''
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time
+        && (
+          (!isSignedIn() && incoming().userId == '') ||
+          (isEmailVerified() && incoming().userId == request.auth.uid)
+        );
+
+      // Action-Based Update Pattern (Admin status updates / internal notes only)
+      allow update: if isAdmin()
+        && isValidId(leadId)
+        && isValidLead(incoming())
+        && incoming().createdAt == existing().createdAt
+        && incoming().userId == existing().userId
+        && incoming().email == existing().email
+        && incoming().name == existing().name
+        && incoming().updatedAt == request.time
+        && (existing().status != 'Закрыта' || isAdmin())
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminNote', 'updatedAt']);
+
+      allow delete: if isAdmin() && isValidId(leadId);
+    }
+
+    // Visual CMS Published Content (public non-PII marketing copy & image URLs)
+    match /site_content/{docId} {
+      allow get: if isValidId(docId) && docId == 'main';
+      allow list: if isAdmin();
+
+      allow create: if isAdmin()
+        && isValidId(docId)
+        && docId == 'main'
+        && isValidSiteContent(incoming())
+        && incoming().updatedBy == request.auth.uid
+        && incoming().updatedAt == request.time;
+
+      allow update: if isAdmin()
+        && isValidId(docId)
+        && docId == 'main'
+        && isValidSiteContent(incoming())
+        && incoming().updatedBy == request.auth.uid
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['fields', 'updatedAt', 'updatedBy']);
+
+      allow delete: if isAdmin() && isValidId(docId) && docId == 'main';
     }
   }
 }

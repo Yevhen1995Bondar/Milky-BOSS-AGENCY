@@ -13,7 +13,7 @@ interface NavbarProps {
 export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onOpenPortal }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { dict } = useLanguage();
-  const { user } = useFirebase();
+  const { user, isAdmin } = useFirebase();
 
   const navLinks = [
     { label: dict.nav.services, href: '#services' },
@@ -24,7 +24,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onOpenPortal }) =
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-[#090a0f]/90 border-b border-white/10 transition-colors">
+    <header
+      className={`sticky z-50 w-full backdrop-blur-md bg-[#090a0f]/90 border-b border-white/10 transition-colors ${
+        isAdmin ? 'top-[45px]' : 'top-0'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-4 md:gap-8">
         {/* Zone 1: Milky BOSS Agency Wordmark & Emblem */}
         <a href="#" className="flex items-center shrink-0 group" aria-label="Milky BOSS Agency Home">

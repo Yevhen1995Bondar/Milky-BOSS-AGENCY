@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { validateContactForm } from '../utils/pricing';
-import { buildSanitizedInquiryPayload } from '../utils/inquiryValidation';
+import { buildSanitizedLeadPayload } from '../utils/cmsUtils';
 import { ContactFormData, FormErrors } from '../types';
 import { CONTACT_EMAIL, CONTACT_PHONE, LOCATION_CITY } from '../data/content';
 import { Mail, Phone, MapPin, Send, Clock, ShieldCheck, X, AlertCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useFirebase } from '../context/FirebaseContext';
+import { useCms } from '../context/CmsContext';
+import { EditableText } from './EditableText';
 import { db, handleFirestoreError, OperationType } from '../firebase';
 
 interface ContactSectionProps {
@@ -21,7 +23,12 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 }) => {
   const { dict, language } = useLanguage();
   const { user } = useFirebase();
+  const { getText } = useCms();
   const c = dict.contact;
+
+  const email = getText('contact.email', CONTACT_EMAIL, true);
+  const phone = getText('contact.phone', CONTACT_PHONE, true);
+  const addressDefault = `MediaPark / Ehrenfeld, 50672 ${LOCATION_CITY}`;
 
   const [formData, setFormData] = useState<ContactFormData>({
     service: prefilledService,
@@ -78,17 +85,17 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
     setSubmitError(null);
     setIsSubmitting(true);
 
-    const inquiryRef = doc(collection(db, 'inquiries'));
-    const path = `inquiries/${inquiryRef.id}`;
+    const leadRef = doc(collection(db, 'leads'));
+    const path = `leads/${leadRef.id}`;
 
     try {
-      const payload = buildSanitizedInquiryPayload(formData, language, user?.uid);
-      await setDoc(inquiryRef, {
+      const payload = buildSanitizedLeadPayload(formData, language, user?.uid);
+      await setDoc(leadRef, {
         ...payload,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       });
-      setReferenceId(inquiryRef.id);
+      setReferenceId(leadRef.id);
       setIsSuccess(true);
       setShowToast(true);
     } catch (error) {
@@ -160,21 +167,34 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
           {/* Left Column: Direct Info & Trust in Cologne */}
           <div className="lg:col-span-5 space-y-8">
             <div>
-              <div className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]">
-                {c.tag}
-              </div>
-              <h2 className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight">
-                {c.heading}
-              </h2>
-              <p className="text-zinc-400 mt-4 text-base leading-relaxed">
-                {c.subtext}
-              </p>
+              <EditableText
+                as="div"
+                contentKey="contact.tag"
+                defaultValue={c.tag}
+                label="Тег контактов"
+                className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]"
+              />
+              <EditableText
+                as="h2"
+                contentKey="contact.heading"
+                defaultValue={c.heading}
+                label="Заголовок контактов"
+                className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight"
+              />
+              <EditableText
+                as="p"
+                contentKey="contact.subtext"
+                defaultValue={c.subtext}
+                multiline
+                label="Описание контактов"
+                className="text-zinc-400 mt-4 text-base leading-relaxed"
+              />
             </div>
 
             {/* Direct Contact Cards */}
             <div className="space-y-4">
               <a
-                href={`mailto:${CONTACT_EMAIL}`}
+                href={`mailto:${email}`}
                 className="flex items-center gap-4 p-4 rounded-xl bg-[#11141c] border border-white/10 hover:border-[#c81e32]/40 transition-colors group"
               >
                 <div className="w-10 h-10 rounded-lg bg-[#c81e32]/10 text-[#c81e32] flex items-center justify-center shrink-0 group-hover:bg-[#c81e32] group-hover:text-white transition-colors">
@@ -182,12 +202,19 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                 </div>
                 <div className="min-w-0">
                   <div className="text-xs text-zinc-400">{c.email_direct}</div>
-                  <div className="text-sm font-semibold text-white truncate">{CONTACT_EMAIL}</div>
+                  <div className="text-sm font-semibold text-white truncate">
+                    <EditableText
+                      contentKey="contact.email"
+                      defaultValue={CONTACT_EMAIL}
+                      shared
+                      label="Email агентства"
+                    />
+                  </div>
                 </div>
               </a>
 
               <a
-                href={`tel:${CONTACT_PHONE.replace(/\s+/g, '')}`}
+                href={`tel:${phone.replace(/\s+/g, '')}`}
                 className="flex items-center gap-4 p-4 rounded-xl bg-[#11141c] border border-white/10 hover:border-[#c81e32]/40 transition-colors group"
               >
                 <div className="w-10 h-10 rounded-lg bg-white/5 text-zinc-300 flex items-center justify-center shrink-0 group-hover:bg-[#c81e32] group-hover:text-white transition-colors">
@@ -195,7 +222,14 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                 </div>
                 <div className="min-w-0">
                   <div className="text-xs text-zinc-400">{c.phone_direct}</div>
-                  <div className="text-sm font-semibold text-white truncate">{CONTACT_PHONE}</div>
+                  <div className="text-sm font-semibold text-white truncate">
+                    <EditableText
+                      contentKey="contact.phone"
+                      defaultValue={CONTACT_PHONE}
+                      shared
+                      label="Телефон агентства"
+                    />
+                  </div>
                 </div>
               </a>
 
@@ -205,7 +239,14 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                 </div>
                 <div>
                   <div className="text-xs text-zinc-400">{c.location_direct}</div>
-                  <div className="text-sm font-semibold text-white">MediaPark / Ehrenfeld, 50672 {LOCATION_CITY}</div>
+                  <div className="text-sm font-semibold text-white">
+                    <EditableText
+                      contentKey="contact.address"
+                      defaultValue={addressDefault}
+                      shared
+                      label="Адрес офиса"
+                    />
+                  </div>
                 </div>
               </div>
             </div>

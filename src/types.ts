@@ -96,6 +96,27 @@ export interface ProjectInquiryRecord {
   updatedAt?: { seconds: number; nanoseconds: number } | null;
 }
 
+export type LeadStatus = 'Новая' | 'В работе' | 'Закрыта';
+
+export interface LeadRecord {
+  id: string;
+  requestedService: string;
+  budget: string;
+  timeline: string;
+  name: string;
+  email: string;
+  phone: string;
+  company: string;
+  message: string;
+  crmInterest: boolean;
+  language: 'de' | 'en';
+  status: LeadStatus;
+  userId: string;
+  adminNote: string;
+  createdAt?: { seconds: number; nanoseconds: number } | null;
+  updatedAt?: { seconds: number; nanoseconds: number } | null;
+}
+
 export interface UserProfileRecord {
   uid: string;
   displayName: string;

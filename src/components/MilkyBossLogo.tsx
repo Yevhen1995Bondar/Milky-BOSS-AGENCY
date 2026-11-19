@@ -1,5 +1,6 @@
 import React from 'react';
 import { resolveAssetUrl } from '../utils/assets';
+import { EditableImage } from './EditableImage';
 
 export interface MilkyBossLogoProps {
   className?: string;
@@ -30,26 +31,41 @@ export const MilkyBossLogo: React.FC<MilkyBossLogoProps> = ({
 
   // Responsive modern picture element for high-performance LCP (<15 KiB AVIF vs >140 KiB PNG)
   const renderResponsiveEmblem = (customClass: string) => (
-    <picture className="inline-flex items-center shrink-0">
-      <source
-        type="image/avif"
-        srcSet={`${resolveAssetUrl('/assets/milkyboss-emblem-1x.avif')} 1x, ${resolveAssetUrl('/assets/milkyboss-emblem-2x.avif')} 2x`}
-      />
-      <source
-        type="image/webp"
-        srcSet={`${resolveAssetUrl('/assets/milkyboss-emblem-1x.webp')} 1x, ${resolveAssetUrl('/assets/milkyboss-emblem-2x.webp')} 2x`}
-      />
-      <img
-        src={resolveAssetUrl('/assets/milkyboss-emblem-1x.webp')}
-        alt="Milky BOSS Agency Emblem"
-        width="307"
-        height="168"
-        fetchPriority="high"
-        loading="eager"
-        decoding="async"
-        className={`${customClass} object-contain`}
-      />
-    </picture>
+    <EditableImage
+      contentKey="brand.emblem"
+      defaultSrc="/assets/milkyboss-emblem-1x.webp"
+      alt="Milky BOSS Agency Emblem"
+      width="307"
+      height="168"
+      loading="eager"
+      fetchPriority="high"
+      decoding="async"
+      label="Логотип Milky BOSS"
+      className={`${customClass} object-contain`}
+    >
+      {() => (
+        <picture className="inline-flex items-center shrink-0">
+          <source
+            type="image/avif"
+            srcSet={`${resolveAssetUrl('/assets/milkyboss-emblem-1x.avif')} 1x, ${resolveAssetUrl('/assets/milkyboss-emblem-2x.avif')} 2x`}
+          />
+          <source
+            type="image/webp"
+            srcSet={`${resolveAssetUrl('/assets/milkyboss-emblem-1x.webp')} 1x, ${resolveAssetUrl('/assets/milkyboss-emblem-2x.webp')} 2x`}
+          />
+          <img
+            src={resolveAssetUrl('/assets/milkyboss-emblem-1x.webp')}
+            alt="Milky BOSS Agency Emblem"
+            width="307"
+            height="168"
+            fetchPriority="high"
+            loading="eager"
+            decoding="async"
+            className={`${customClass} object-contain`}
+          />
+        </picture>
+      )}
+    </EditableImage>
   );
 
   if (variant === 'badge') {

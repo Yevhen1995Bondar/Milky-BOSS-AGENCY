@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Bot, ShoppingBag, Database, Zap, CheckCircle2, Cpu } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { EditableText } from './EditableText';
 
 export const WorkflowSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'crm' | 'shopify' | 'ai'>('crm');
@@ -14,15 +15,28 @@ export const WorkflowSection: React.FC = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="max-w-3xl">
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]">
-            {w.tag}
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight">
-            {w.heading}
-          </h2>
-          <p className="text-zinc-400 mt-3 text-base sm:text-lg leading-relaxed">
-            {w.subtext}
-          </p>
+          <EditableText
+            as="div"
+            contentKey="workflow.tag"
+            defaultValue={w.tag}
+            label="Тег AI Workflow"
+            className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]"
+          />
+          <EditableText
+            as="h2"
+            contentKey="workflow.heading"
+            defaultValue={w.heading}
+            label="Заголовок AI Workflow"
+            className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight"
+          />
+          <EditableText
+            as="p"
+            contentKey="workflow.subtext"
+            defaultValue={w.subtext}
+            multiline
+            label="Подзаголовок AI Workflow"
+            className="text-zinc-400 mt-3 text-base sm:text-lg leading-relaxed block"
+          />
         </div>
 
         {/* Feature Interactive Showcase */}
@@ -76,14 +90,25 @@ export const WorkflowSection: React.FC = () => {
                 </span>
                 <Zap className="w-4 h-4 text-[#c81e32]" />
               </div>
-              <h4 className="text-lg font-bold text-white font-display">
-                {language === 'de' ? 'Erfassung & Routing' : 'Capture & Ingestion'}
-              </h4>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                {language === 'de'
-                  ? 'Kunde bestellt auf Shopify oder füllt Anfrageformular auf der Landingpage aus. Daten werden validiert und in Echtzeit per Webhook weitergeleitet.'
-                  : 'Client places an order on Shopify or submits a lead inquiry. Submissions are instantly validated and streamed via low-latency webhooks.'}
-              </p>
+              <EditableText
+                as="h4"
+                contentKey="workflow.step1.title"
+                defaultValue={language === 'de' ? 'Erfassung & Routing' : 'Capture & Ingestion'}
+                label="Workflow шаг 1 заголовок"
+                className="text-lg font-bold text-white font-display block"
+              />
+              <EditableText
+                as="p"
+                contentKey="workflow.step1.desc"
+                defaultValue={
+                  language === 'de'
+                    ? 'Kunde bestellt auf Shopify oder füllt Anfrageformular auf der Landingpage aus. Daten werden validiert und in Echtzeit per Webhook weitergeleitet.'
+                    : 'Client places an order on Shopify or submits a lead inquiry. Submissions are instantly validated and streamed via low-latency webhooks.'
+                }
+                multiline
+                label="Workflow шаг 1 текст"
+                className="text-xs text-zinc-400 leading-relaxed block"
+              />
               <div className="pt-2 text-xs font-mono text-zinc-300 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{language === 'de' ? 'Reaktionszeit < 200ms' : 'Latency < 200ms'}</span>
@@ -98,14 +123,25 @@ export const WorkflowSection: React.FC = () => {
                 </span>
                 <Cpu className="w-4 h-4 text-[#c81e32]" />
               </div>
-              <h4 className="text-lg font-bold text-white font-display">
-                {language === 'de' ? 'Google AI Studio Analyse' : 'Google AI Studio Evaluation'}
-              </h4>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                {language === 'de'
-                  ? 'Das Modell klassifiziert Anfragen nach Dringlichkeit, Budget und Produktkategorie. Es generiert personalisierte Antwortentwürfe oder Rabatt-Anreize für den Checkout.'
-                  : 'Gemini models evaluate intent, purchase authority, and urgent objections. It generates contextual follow-ups or personalized checkout incentives.'}
-              </p>
+              <EditableText
+                as="h4"
+                contentKey="workflow.step2.title"
+                defaultValue={language === 'de' ? 'Google AI Studio Analyse' : 'Google AI Studio Evaluation'}
+                label="Workflow шаг 2 заголовок"
+                className="text-lg font-bold text-white font-display block"
+              />
+              <EditableText
+                as="p"
+                contentKey="workflow.step2.desc"
+                defaultValue={
+                  language === 'de'
+                    ? 'Das Modell klassifiziert Anfragen nach Dringlichkeit, Budget und Produktkategorie. Es generiert personalisierte Antwortentwürfe oder Rabatt-Anreize für den Checkout.'
+                    : 'Gemini models evaluate intent, purchase authority, and urgent objections. It generates contextual follow-ups or personalized checkout incentives.'
+                }
+                multiline
+                label="Workflow шаг 2 текст"
+                className="text-xs text-zinc-400 leading-relaxed block"
+              />
               <div className="pt-2 text-xs font-mono text-[#c81e32] flex items-center gap-1.5">
                 <Bot className="w-3.5 h-3.5" />
                 <span>{language === 'de' ? 'Intelligente Vor-Qualifizierung' : 'Smart Pre-Qualification'}</span>
@@ -120,14 +156,25 @@ export const WorkflowSection: React.FC = () => {
                 </span>
                 <Database className="w-4 h-4 text-emerald-400" />
               </div>
-              <h4 className="text-lg font-bold text-white font-display">
-                {language === 'de' ? 'CRM & Fulfillment Sync' : 'CRM & Warehouse Sync'}
-              </h4>
-              <p className="text-xs text-zinc-400 leading-relaxed">
-                {language === 'de'
-                  ? 'Automatische Anlage des Kontakts in HubSpot, Klaviyo oder Pipedrive. Bestätigungen per WhatsApp oder SMS und direkte Übergabe an das Versandlager.'
-                  : 'Seamless record creation in HubSpot, Klaviyo, or Pipedrive. Instant notifications dispatched and automated transmission to fulfillment systems.'}
-              </p>
+              <EditableText
+                as="h4"
+                contentKey="workflow.step3.title"
+                defaultValue={language === 'de' ? 'CRM & Fulfillment Sync' : 'CRM & Warehouse Sync'}
+                label="Workflow шаг 3 заголовок"
+                className="text-lg font-bold text-white font-display block"
+              />
+              <EditableText
+                as="p"
+                contentKey="workflow.step3.desc"
+                defaultValue={
+                  language === 'de'
+                    ? 'Automatische Anlage des Kontakts in HubSpot, Klaviyo oder Pipedrive. Bestätigungen per WhatsApp oder SMS und direkte Übergabe an das Versandlager.'
+                    : 'Seamless record creation in HubSpot, Klaviyo, or Pipedrive. Instant notifications dispatched and automated transmission to fulfillment systems.'
+                }
+                multiline
+                label="Workflow шаг 3 текст"
+                className="text-xs text-zinc-400 leading-relaxed block"
+              />
               <div className="pt-2 text-xs font-mono text-zinc-300 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>{language === 'de' ? '0 Minuten manueller Aufwand' : 'Zero manual repetitive labor'}</span>

@@ -27,8 +27,9 @@ import {
 import { useFirebase } from '../context/FirebaseContext';
 import { useLanguage } from '../context/LanguageContext';
 import { db, handleFirestoreError, OperationType } from '../firebase';
-import { InquiryStatus, ProjectInquiryRecord } from '../types';
+import { LeadStatus, LeadRecord } from '../types';
 import { clampAdminNote } from '../utils/inquiryValidation';
+import { LEAD_STATUSES } from '../utils/cmsUtils';
 
 interface PortalModalProps {
   isOpen: boolean;
@@ -36,7 +37,7 @@ interface PortalModalProps {
   onNewInquiry: () => void;
 }
 
-const STATUS_ORDER: InquiryStatus[] = ['new', 'in_review', 'contacted', 'archived'];
+const STATUS_ORDER: readonly LeadStatus[] = LEAD_STATUSES;
 
 export const PortalModal: React.FC<PortalModalProps> = ({
   isOpen,
@@ -48,9 +49,9 @@ export const PortalModal: React.FC<PortalModalProps> = ({
   const { dict, language } = useLanguage();
   const p = dict.portal;
 
-  const [inquiries, setInquiries] = useState<ProjectInquiryRecord[]>([]);
+  const [inquiries, setInquiries] = useState<LeadRecord[]>([]);
   const [loadingInquiries, setLoadingInquiries] = useState<boolean>(false);
-  const [statusFilter, setStatusFilter] = useState<'all' | InquiryStatus>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | LeadStatus>('all');
   const [editingNotes, setEditingNotes] = useState<Record<string, string>>({});
   const [savingId, setSavingId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
@@ -76,15 +77,15 @@ export const PortalModal: React.FC<PortalModalProps> = ({
     setLoadingInquiries(true);
     setPortalError(null);
 
-    const inquiriesRef = collection(db, 'inquiries');
+    const leadsRef = collection(db, 'leads');
     const q = isAdmin
-      ? query(inquiriesRef, orderBy('createdAt', 'desc'))
-      : query(inquiriesRef, where('userId', '==', user.uid));
+      ? query(leadsRef, orderBy('createdAt', 'desc'))
+      : query(leadsRef, where('userId', '==', user.uid));
 
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const rows: ProjectInquiryRecord[] = snapshot.docs.map((d) => {
+        const rows: LeadRecord[] = snapshot.docs.map((d) => {
           const data = d.data();
           return {
             id: d.id,
@@ -98,7 +99,7 @@ export const PortalModal: React.FC<PortalModalProps> = ({
             message: String(data.message ?? ''),
             crmInterest: Boolean(data.crmInterest),
             language: data.language === 'en' ? 'en' : 'de',
-            status: STATUS_ORDER.includes(data.status) ? data.status : 'new',
+            status: STATUS_ORDER.includes(data.status) ? data.status : 'Новая',
             userId: String(data.userId ?? ''),
             adminNote: String(data.adminNote ?? ''),
             createdAt: data.createdAt ?? null,
@@ -113,7 +114,7 @@ export const PortalModal: React.FC<PortalModalProps> = ({
       (error) => {
         setLoadingInquiries(false);
         setPortalError(error.message);
-        handleFirestoreError(error, OperationType.LIST, 'inquiries');
+        handleFirestoreError(error, OperationType.LIST, 'leads');
       }
     );
 
@@ -130,60 +131,57 @@ export const PortalModal: React.FC<PortalModalProps> = ({
     );
   };
 
-  const getStatusBadge = (status: InquiryStatus) => {
-    const labels: Record<InquiryStatus, string> = {
-      new: p.status_new,
-      in_review: p.status_in_review,
-      contacted: p.status_contacted,
-      archived: p.status_archived,
+  const getStatusBadge = (status: LeadStatus) => {
+    const labels: Record<LeadStatus, string> = {
+      Новая: p.status_new,
+      'В работе': p.status_in_review,
+      Закрыта: p.status_contacted,
     };
-    const styles: Record<InquiryStatus, string> = {
-      new: 'bg-[#c81e32]/15 text-[#ff5a6e] border-[#c81e32]/40',
-      in_review: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
-      contacted: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
-      archived: 'bg-zinc-500/15 text-zinc-400 border-zinc-500/30',
+    const styles: Record<LeadStatus, string> = {
+      Новая: 'bg-[#c81e32]/15 text-[#ff5a6e] border-[#c81e32]/40',
+      'В работе': 'bg-amber-500/15 text-amber-300 border-amber-500/40',
+      Закрыта: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40',
     };
     return (
       <span
         className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border ${styles[status]}`}
       >
-        {status === 'new' && <Clock className="w-3 h-3" />}
-        {status === 'in_review' && <FileText className="w-3 h-3" />}
-        {status === 'contacted' && <CheckCircle2 className="w-3 h-3" />}
-        {status === 'archived' && <Archive className="w-3 h-3" />}
+        {status === 'Новая' && <Clock className="w-3 h-3" />}
+        {status === 'В работе' && <FileText className="w-3 h-3" />}
+        {status === 'Закрыта' && <CheckCircle2 className="w-3 h-3" />}
         {labels[status]}
       </span>
     );
   };
 
-  const handleStatusChange = async (inquiryId: string, nextStatus: InquiryStatus) => {
+  const handleStatusChange = async (inquiryId: string, nextStatus: LeadStatus) => {
     setActionError(null);
     setSavingId(inquiryId);
     try {
-      await updateDoc(doc(db, 'inquiries', inquiryId), {
+      await updateDoc(doc(db, 'leads', inquiryId), {
         status: nextStatus,
         updatedAt: serverTimestamp(),
       });
     } catch (error) {
       setActionError(p.update_error);
-      handleFirestoreError(error, OperationType.UPDATE, `inquiries/${inquiryId}`);
+      handleFirestoreError(error, OperationType.UPDATE, `leads/${inquiryId}`);
     } finally {
       setSavingId(null);
     }
   };
 
-  const handleSaveNote = async (inquiry: ProjectInquiryRecord) => {
+  const handleSaveNote = async (inquiry: LeadRecord) => {
     setActionError(null);
     setSavingId(inquiry.id);
     const note = clampAdminNote(editingNotes[inquiry.id] ?? inquiry.adminNote);
     try {
-      await updateDoc(doc(db, 'inquiries', inquiry.id), {
+      await updateDoc(doc(db, 'leads', inquiry.id), {
         adminNote: note,
         updatedAt: serverTimestamp(),
       });
     } catch (error) {
       setActionError(p.update_error);
-      handleFirestoreError(error, OperationType.UPDATE, `inquiries/${inquiry.id}`);
+      handleFirestoreError(error, OperationType.UPDATE, `leads/${inquiry.id}`);
     } finally {
       setSavingId(null);
     }
@@ -193,11 +191,11 @@ export const PortalModal: React.FC<PortalModalProps> = ({
     setActionError(null);
     setSavingId(inquiryId);
     try {
-      await deleteDoc(doc(db, 'inquiries', inquiryId));
+      await deleteDoc(doc(db, 'leads', inquiryId));
       setConfirmDeleteId(null);
     } catch (error) {
       setActionError(p.update_error);
-      handleFirestoreError(error, OperationType.DELETE, `inquiries/${inquiryId}`);
+      handleFirestoreError(error, OperationType.DELETE, `leads/${inquiryId}`);
     } finally {
       setSavingId(null);
     }
@@ -324,12 +322,11 @@ export const PortalModal: React.FC<PortalModalProps> = ({
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-2">
                   {(['all', ...STATUS_ORDER] as const).map((statusKey) => {
-                    const labelMap: Record<'all' | InquiryStatus, string> = {
+                    const labelMap: Record<'all' | LeadStatus, string> = {
                       all: p.filter_all,
-                      new: p.status_new,
-                      in_review: p.status_in_review,
-                      contacted: p.status_contacted,
-                      archived: p.status_archived,
+                      Новая: p.status_new,
+                      'В работе': p.status_in_review,
+                      Закрыта: p.status_contacted,
                     };
                     const active = statusFilter === statusKey;
                     return (
@@ -456,15 +453,14 @@ export const PortalModal: React.FC<PortalModalProps> = ({
                                   onChange={(e) =>
                                     handleStatusChange(
                                       inquiry.id,
-                                      e.target.value as InquiryStatus
+                                      e.target.value as LeadStatus
                                     )
                                   }
                                   className="bg-[#1b202f] border border-white/15 rounded-md px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-[#c81e32]"
                                 >
-                                  <option value="new">{p.status_new}</option>
-                                  <option value="in_review">{p.status_in_review}</option>
-                                  <option value="contacted">{p.status_contacted}</option>
-                                  <option value="archived">{p.status_archived}</option>
+                                  <option value="Новая">{p.status_new}</option>
+                                  <option value="В работе">{p.status_in_review}</option>
+                                  <option value="Закрыта">{p.status_contacted}</option>
                                 </select>
                               </div>
 

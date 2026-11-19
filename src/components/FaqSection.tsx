@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronDown } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { EditableText } from './EditableText';
 
 export const FaqSection: React.FC = () => {
   const { faqs, dict } = useLanguage();
@@ -15,15 +16,28 @@ export const FaqSection: React.FC = () => {
     <section id="faq" className="py-24 bg-[#090a0f] relative overflow-hidden">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto">
-          <div className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]">
-            {dict.faq.tag}
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight">
-            {dict.faq.heading}
-          </h2>
-          <p className="text-zinc-400 mt-3 text-base">
-            {dict.faq.subtext}
-          </p>
+          <EditableText
+            as="div"
+            contentKey="faq.tag"
+            defaultValue={dict.faq.tag}
+            label="Тег FAQ"
+            className="text-xs font-semibold uppercase tracking-wider text-[#c81e32]"
+          />
+          <EditableText
+            as="h2"
+            contentKey="faq.heading"
+            defaultValue={dict.faq.heading}
+            label="Заголовок FAQ"
+            className="text-3xl sm:text-4xl font-bold font-display text-white mt-2 tracking-tight"
+          />
+          <EditableText
+            as="p"
+            contentKey="faq.subtext"
+            defaultValue={dict.faq.subtext}
+            multiline
+            label="Подзаголовок FAQ"
+            className="text-zinc-400 mt-3 text-base block"
+          />
         </div>
 
         <div className="mt-12 space-y-4">
@@ -38,9 +52,12 @@ export const FaqSection: React.FC = () => {
                   onClick={() => toggle(idx)}
                   className="w-full text-left p-6 flex items-center justify-between gap-4 cursor-pointer hover:bg-white/[0.02]"
                 >
-                  <span className="text-base font-semibold text-white font-display">
-                    {faq.q}
-                  </span>
+                  <EditableText
+                    contentKey={`faq.${idx}.q`}
+                    defaultValue={faq.q}
+                    label={`FAQ вопрос #${idx + 1}`}
+                    className="text-base font-semibold text-white font-display"
+                  />
                   <ChevronDown
                     className={`w-5 h-5 text-zinc-400 shrink-0 transition-transform duration-200 ${
                       isOpen ? 'transform rotate-180 text-[#c81e32]' : ''
@@ -57,7 +74,13 @@ export const FaqSection: React.FC = () => {
                       transition={{ duration: 0.2 }}
                     >
                       <div className="px-6 pb-6 text-sm text-zinc-300 leading-relaxed border-t border-white/5 pt-4">
-                        {faq.a}
+                        <EditableText
+                          as="p"
+                          contentKey={`faq.${idx}.a`}
+                          defaultValue={faq.a}
+                          multiline
+                          label={`FAQ ответ #${idx + 1}`}
+                        />
                       </div>
                     </motion.div>
                   )}

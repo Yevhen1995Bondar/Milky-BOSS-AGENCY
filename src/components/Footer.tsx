@@ -14,7 +14,7 @@ export const Footer: React.FC = () => {
 
   const email = getText('contact.email', CONTACT_EMAIL, true);
   const phone = getText('contact.phone', CONTACT_PHONE, true);
-  const addressDefault = `MediaPark / Ehrenfeld, 50672 ${LOCATION_CITY}`;
+  const addressDefault = LOCATION_CITY;
 
   return (
     <footer className="bg-[#07080c] border-t border-white/10 text-zinc-400 text-xs">
@@ -34,12 +34,12 @@ export const Footer: React.FC = () => {
               className="text-zinc-400 max-w-sm leading-relaxed block"
             />
             <div className="text-zinc-400">
-              {language === 'de' ? 'Standort:' : 'Location:'}{' '}
+              {language === 'de' ? 'Standort:' : 'Region:'}{' '}
               <EditableText
-                contentKey="contact.address"
+                contentKey="contact.footerRegion"
                 defaultValue={addressDefault}
                 shared
-                label="Адрес офиса"
+                label="Регион работы"
               />
             </div>
           </div>
@@ -116,11 +116,15 @@ export const Footer: React.FC = () => {
         </div>
 
         {/* Bottom Legal Bar */}
-        <div className="mt-12 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-zinc-400 text-[11px]">
-            &copy; {new Date().getFullYear()} Milky BOSS Agency.{' '}
-            <EditableText contentKey="footer.rights" defaultValue={f.rights} label="Права в футере" />
-          </div>
+        <div className="mt-12 pt-8 border-t border-white/5 space-y-5">
+          <p className="text-zinc-400 text-[11px] leading-relaxed">
+            {f.tax_notice}
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-zinc-400 text-[11px]">
+              &copy; {new Date().getFullYear()} Milky BOSS Agency.{' '}
+              <EditableText contentKey="footer.rights" defaultValue={f.rights} label="Права в футере" />
+            </div>
           <div className="flex items-center gap-6 text-[11px]">
             <button
               onClick={() => setLegalModal('imprint')}
@@ -137,15 +141,16 @@ export const Footer: React.FC = () => {
             <a href="#services" className="hover:text-white transition-colors">
               {language === 'de' ? 'Nach oben ↑' : 'Back to top ↑'}
             </a>
-            <button
-              type="button"
-              onClick={() => openAdminModal('leads')}
-              aria-label="Admin"
-              title="Admin (#admin)"
-              className="p-1 text-zinc-600 hover:text-zinc-300 opacity-60 hover:opacity-100 transition-all cursor-pointer"
-            >
-              <Lock className="w-3.5 h-3.5" />
-            </button>
+              <button
+                type="button"
+                onClick={() => openAdminModal('leads')}
+                aria-label="Admin"
+                title="Admin (#admin)"
+                className="p-1 text-zinc-600 hover:text-zinc-300 opacity-60 hover:opacity-100 transition-all cursor-pointer"
+              >
+                <Lock className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -173,8 +178,7 @@ export const Footer: React.FC = () => {
                     <strong>{language === 'de' ? 'Angaben gemäß § 5 DDG:' : 'Information according to German Telemedia Act (§ 5 DDG):'}</strong><br />
                     Milky BOSS Agency<br />
                     Webentwicklung &amp; E-Commerce Dienstleistungen<br />
-                    MediaPark / Ehrenfeld<br />
-                    50672 Köln, Deutschland
+                    Köln, Deutschland
                   </p>
                   <p>
                     <strong>{language === 'de' ? 'Kontakt:' : 'Contact:'}</strong><br />
@@ -185,6 +189,10 @@ export const Footer: React.FC = () => {
                     <strong>Verantwortlich für den Inhalt:</strong><br />
                     Milky BOSS Agency Lead Developer &amp; Marketing Strategist<br />
                     Köln, Deutschland
+                  </p>
+                  <p>
+                    <strong>{language === 'de' ? 'Umsatzsteuer-Hinweis (§ 19 UStG):' : 'VAT Notice (§ 19 UStG):'}</strong><br />
+                    {f.tax_notice}
                   </p>
                 </>
               ) : (

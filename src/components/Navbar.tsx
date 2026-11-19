@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, ArrowUpRight, UserCheck } from 'lucide-react';
+import { Menu, X, ArrowUpRight } from 'lucide-react';
 import { MilkyBossLogo } from './MilkyBossLogo';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { useLanguage } from '../context/LanguageContext';
@@ -7,13 +7,12 @@ import { useFirebase } from '../context/FirebaseContext';
 
 interface NavbarProps {
   onOpenContact: () => void;
-  onOpenPortal: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onOpenPortal }) => {
+export const Navbar: React.FC<NavbarProps> = ({ onOpenContact }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { dict } = useLanguage();
-  const { user, isAdmin } = useFirebase();
+  const { isAdmin } = useFirebase();
 
   const navLinks = [
     { label: dict.nav.services, href: '#services' },
@@ -48,18 +47,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onOpenPortal }) =
           ))}
         </nav>
 
-        {/* Zone 3: Language Switcher, Portal & Primary Action */}
+        {/* Zone 3: Language Switcher & Primary Action */}
         <div className="hidden sm:flex items-center gap-3 shrink-0">
           <LanguageSwitcher />
-
-          <button
-            type="button"
-            onClick={onOpenPortal}
-            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-zinc-200 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-md transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-          >
-            <UserCheck className={`w-3.5 h-3.5 ${user ? 'text-emerald-400' : 'text-zinc-400'}`} />
-            <span>{user ? (user.displayName?.split(' ')[0] || dict.nav.portal) : dict.nav.portal}</span>
-          </button>
 
           <button
             onClick={onOpenContact}
@@ -100,18 +90,6 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenContact, onOpenPortal }) =
           </div>
 
           <div className="pt-2 space-y-2.5">
-            <button
-              type="button"
-              onClick={() => {
-                setMobileMenuOpen(false);
-                onOpenPortal();
-              }}
-              className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-zinc-200 bg-white/5 border border-white/10 rounded-md hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <UserCheck className={`w-4 h-4 ${user ? 'text-emerald-400' : 'text-zinc-400'}`} />
-              <span>{dict.nav.portal}</span>
-            </button>
-
             <button
               onClick={() => {
                 setMobileMenuOpen(false);

@@ -1,7 +1,7 @@
 import { ContactFormData, FormErrors } from '../types';
 
 export interface EstimateOptions {
-  serviceType: 'landingpage' | 'shopify' | 'corporate' | 'enterprise';
+  serviceType: 'landingpage' | 'website_ads' | 'shopify';
   additionalFeatures: string[];
   maintenanceRetainer: boolean;
   adsManagement: boolean;
@@ -14,66 +14,56 @@ export function calculateProjectEstimate(options: EstimateOptions): {
   totalOneTime: number;
   estimatedWeeks: number;
 } {
-  let basePrice = 1850;
-  let estimatedWeeks = 2;
+  let basePrice = 500;
+  let estimatedWeeks = 1;
 
   switch (options.serviceType) {
     case 'landingpage':
-      basePrice = 1850;
-      estimatedWeeks = 2;
+      basePrice = 500;
+      estimatedWeeks = 1;
+      break;
+    case 'website_ads':
+      basePrice = 750;
+      estimatedWeeks = 1;
       break;
     case 'shopify':
-      basePrice = 3900;
-      estimatedWeeks = 3;
-      break;
-    case 'corporate':
-      basePrice = 4400;
-      estimatedWeeks = 4;
-      break;
-    case 'enterprise':
-      basePrice = 6500;
-      estimatedWeeks = 6;
+      basePrice = 950;
+      estimatedWeeks = 2;
       break;
   }
 
   let addOnPrice = 0;
   for (const feature of options.additionalFeatures) {
     switch (feature) {
-      case 'crm_integration':
-        addOnPrice += 800;
+      case 'photo_video_nrw':
+        addOnPrice += 350;
         break;
-      case 'google_ai_automation':
-        addOnPrice += 950;
+      case 'social_strategy_plan':
+        addOnPrice += 450;
+        break;
+      case 'google_ads_setup':
+        addOnPrice += 250;
         break;
       case 'meta_ads_setup':
-        addOnPrice += 750;
+        addOnPrice += 350;
         break;
-      case 'social_audit_content':
-        addOnPrice += 650;
+      case 'crm_integration':
+        addOnPrice += 290;
         break;
-      case 'strategic_swot_pestel':
-        addOnPrice += 700;
-        break;
-      case 'seo_bundle':
-        addOnPrice += 600;
-        break;
-      case 'multilingual':
-        addOnPrice += 750;
-        break;
-      case 'custom_checkout':
-        addOnPrice += 850;
+      case 'extra_products':
+        addOnPrice += 350;
         break;
       default:
-        addOnPrice += 400;
+        addOnPrice += 250;
     }
   }
 
   let monthlyRetainer = 0;
   if (options.maintenanceRetainer) {
-    monthlyRetainer += 390;
+    monthlyRetainer += 90;
   }
   if (options.adsManagement) {
-    monthlyRetainer += 850;
+    monthlyRetainer += 250;
   }
 
   return {

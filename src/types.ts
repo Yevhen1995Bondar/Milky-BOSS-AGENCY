@@ -1,6 +1,7 @@
 export type ServiceCategory =
   | 'shopify'
   | 'landingpage'
+  | 'photo-video'
   | 'corporate'
   | 'marketing'
   | 'meta-ads'
@@ -49,11 +50,21 @@ export interface PricingPlan {
   name: string;
   subtitle: string;
   price: string;
+  priceNote?: string;
+  monthlyPrice?: string;
   period?: string;
   recommended?: boolean;
   deliveryTime: string;
   features: string[];
   suitableFor: string;
+}
+
+export interface AddonServiceItem {
+  id: string;
+  badge: string;
+  name: string;
+  price: string;
+  description: string;
 }
 
 export interface ContactFormData {

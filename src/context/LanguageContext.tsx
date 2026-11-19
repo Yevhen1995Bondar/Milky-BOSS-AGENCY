@@ -5,12 +5,13 @@ import {
   SERVICES_I18N,
   PROJECTS_I18N,
   PRICING_PLANS_I18N,
+  ADDON_SERVICES_I18N,
   TESTIMONIALS_I18N,
   FAQS_I18N,
   TestimonialItem,
   FaqItem,
 } from '../data/translations';
-import { ServiceItem, ProjectCaseStudy, PricingPlan } from '../types';
+import { ServiceItem, ProjectCaseStudy, PricingPlan, AddonServiceItem } from '../types';
 
 interface LanguageContextType {
   language: Language;
@@ -21,6 +22,7 @@ interface LanguageContextType {
   services: ServiceItem[];
   projects: ProjectCaseStudy[];
   pricingPlans: PricingPlan[];
+  addonServices: AddonServiceItem[];
   testimonials: TestimonialItem[];
   faqs: FaqItem[];
 }
@@ -70,6 +72,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     services: SERVICES_I18N[language],
     projects: PROJECTS_I18N[language],
     pricingPlans: PRICING_PLANS_I18N[language],
+    addonServices: ADDON_SERVICES_I18N[language],
     testimonials: TESTIMONIALS_I18N[language],
     faqs: FAQS_I18N[language],
   };

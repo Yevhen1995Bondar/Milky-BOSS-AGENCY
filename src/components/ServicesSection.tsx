@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ShoppingBag, Target, BarChart3, Bot, Check, ArrowRight, Megaphone, Share2, Compass } from 'lucide-react';
+import { ShoppingBag, Target, BarChart3, Bot, Check, ArrowRight, Megaphone, Share2, Compass, Camera } from 'lucide-react';
 import { ServiceItem } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 import { EditableText } from './EditableText';
@@ -21,6 +21,8 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
         return <ShoppingBag className="w-5 h-5" />;
       case 'landingpage':
         return <Target className="w-5 h-5" />;
+      case 'photo-video':
+        return <Camera className="w-5 h-5" />;
       case 'meta-ads':
         return <Megaphone className="w-5 h-5" />;
       case 'social-audit':
@@ -121,7 +123,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
           </div>
 
           {/* Right: Detailed Deep-Dive Card */}
-          <div className="lg:col-span-7">
+          <div className="lg:col-span-7 min-w-0">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeService.id + language}
@@ -129,15 +131,16 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -15 }}
                 transition={{ duration: 0.35, ease: 'easeOut' }}
-                className="rounded-2xl border border-white/10 bg-[#11141c] p-7 sm:p-9 shadow-2xl relative"
+                className="rounded-2xl border border-white/10 bg-[#11141c] p-6 sm:p-9 shadow-2xl relative min-w-0"
               >
                 {/* Metric Highlight Header */}
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#c81e32]/10 border border-[#c81e32]/30 text-xs font-semibold text-[#ff3852] mb-6">
-                  <span>●</span>
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#c81e32]/10 border border-[#c81e32]/30 text-xs font-semibold text-[#ff3852] mb-6 max-w-full">
+                  <span className="shrink-0">●</span>
                   <EditableText
                     contentKey={`service.${activeService.id}.metrics`}
                     defaultValue={activeService.metricsHighlight}
                     label="Метрика услуги"
+                    className="break-words"
                   />
                 </div>
 
@@ -179,10 +182,10 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
                 </div>
 
                 {/* Tech Stack & Target audience */}
-                <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
+                <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row sm:flex-wrap sm:items-end justify-between gap-5 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="text-xs text-zinc-400 font-medium">
-                      {language === 'de' ? 'Technologien:' : 'Technologies:'}
+                      {language === 'de' ? 'Leistungsfokus:' : 'Key Focus:'}
                     </div>
                     <div className="flex flex-wrap gap-2 mt-2">
                       {activeService.technologies.map((tech) => (
@@ -198,10 +201,10 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onSelectServic
 
                   <button
                     onClick={() => onSelectService(activeService.title)}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs uppercase tracking-wider font-semibold text-white bg-[#c81e32] hover:bg-[#b01829] rounded-md transition-all shrink-0 cursor-pointer"
+                    className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs uppercase tracking-wider font-semibold text-white bg-[#c81e32] hover:bg-[#b01829] rounded-md transition-all shrink-0 whitespace-nowrap self-start sm:self-auto cursor-pointer"
                   >
                     <span>{dict.services_section.details_cta}</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4 shrink-0" />
                   </button>
                 </div>
               </motion.div>

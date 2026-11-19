@@ -4,8 +4,8 @@ import { collection, doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { validateContactForm } from '../utils/pricing';
 import { buildSanitizedLeadPayload } from '../utils/cmsUtils';
 import { ContactFormData, FormErrors } from '../types';
-import { CONTACT_EMAIL, CONTACT_PHONE, LOCATION_CITY } from '../data/content';
-import { Mail, Phone, MapPin, Send, Clock, ShieldCheck, X, AlertCircle } from 'lucide-react';
+import { CONTACT_EMAIL, CONTACT_PHONE } from '../data/content';
+import { Mail, Phone, MapPin, Send, Clock, ShieldCheck, X, AlertCircle, MessageCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { useFirebase } from '../context/FirebaseContext';
 import { useCms } from '../context/CmsContext';
@@ -28,7 +28,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
 
   const email = getText('contact.email', CONTACT_EMAIL, true);
   const phone = getText('contact.phone', CONTACT_PHONE, true);
-  const addressDefault = `MediaPark / Ehrenfeld, 50672 ${LOCATION_CITY}`;
+  const cleanPhoneHref = phone.replace(/[^\d+]/g, '');
+  const whatsappNumber = cleanPhoneHref.replace(/^\+/, '');
 
   const [formData, setFormData] = useState<ContactFormData>({
     service: prefilledService,
@@ -213,38 +214,50 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                 </div>
               </a>
 
-              <a
-                href={`tel:${phone.replace(/\s+/g, '')}`}
-                className="flex items-center gap-4 p-4 rounded-xl bg-[#11141c] border border-white/10 hover:border-[#c81e32]/40 transition-colors group"
-              >
-                <div className="w-10 h-10 rounded-lg bg-white/5 text-zinc-300 flex items-center justify-center shrink-0 group-hover:bg-[#c81e32] group-hover:text-white transition-colors">
-                  <Phone className="w-5 h-5" />
-                </div>
-                <div className="min-w-0">
-                  <div className="text-xs text-zinc-400">{c.phone_direct}</div>
-                  <div className="text-sm font-semibold text-white truncate">
-                    <EditableText
-                      contentKey="contact.phone"
-                      defaultValue={CONTACT_PHONE}
-                      shared
-                      label="Телефон агентства"
-                    />
+              <div className="flex flex-wrap sm:flex-nowrap items-center justify-between gap-3 p-4 rounded-xl bg-[#11141c] border border-white/10 hover:border-[#c81e32]/40 transition-colors group">
+                <a
+                  href={`tel:${cleanPhoneHref}`}
+                  className="flex items-center gap-4 min-w-0 flex-1"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-white/5 text-zinc-300 flex items-center justify-center shrink-0 group-hover:bg-[#c81e32] group-hover:text-white transition-colors">
+                    <Phone className="w-5 h-5" />
                   </div>
-                </div>
-              </a>
+                  <div className="min-w-0">
+                    <div className="text-xs text-zinc-400">{c.phone_direct}</div>
+                    <div className="text-sm font-semibold text-white truncate">
+                      <EditableText
+                        contentKey="contact.phone"
+                        defaultValue={CONTACT_PHONE}
+                        shared
+                        label="Телефон агентства"
+                      />
+                    </div>
+                  </div>
+                </a>
+                <a
+                  href={`https://wa.me/${whatsappNumber}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/25 text-xs font-semibold transition-colors shrink-0 whitespace-nowrap"
+                  aria-label="WhatsApp"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  <span>WhatsApp</span>
+                </a>
+              </div>
 
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-[#11141c] border border-white/10">
-                <div className="w-10 h-10 rounded-lg bg-white/5 text-zinc-300 flex items-center justify-center shrink-0">
+              <div className="flex items-start gap-4 p-4 rounded-xl bg-[#11141c] border border-white/10">
+                <div className="w-10 h-10 rounded-lg bg-white/5 text-zinc-300 flex items-center justify-center shrink-0 mt-0.5">
                   <MapPin className="w-5 h-5" />
                 </div>
-                <div>
-                  <div className="text-xs text-zinc-400">{c.location_direct}</div>
-                  <div className="text-sm font-semibold text-white">
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-white">{c.location_direct}</div>
+                  <div className="text-xs text-zinc-400 mt-1 leading-relaxed">
                     <EditableText
-                      contentKey="contact.address"
-                      defaultValue={addressDefault}
-                      shared
-                      label="Адрес офиса"
+                      contentKey="contact.serviceArea"
+                      defaultValue={c.location_value}
+                      multiline
+                      label="Зона обслуживания"
                     />
                   </div>
                 </div>
@@ -366,27 +379,46 @@ export const ContactSection: React.FC<ContactSectionProps> = ({
                       onChange={(e) => setFormData({ ...formData, service: e.target.value })}
                       className="w-full bg-[#181c26] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-white focus:outline-none focus:border-[#c81e32]"
                     >
-                      <option value="Shopify Onlineshop (Neubau oder Relaunch)">
-                        {language === 'de' ? 'Shopify Onlineshop (Neubau oder Relaunch)' : 'Shopify Store (New Build or Relaunch)'}
+                      <option value="High-Converting Websites & Landingpages">
+                        {language === 'de' ? 'High-Converting Websites & Landingpages' : 'High-Converting Websites & Landing Pages'}
                       </option>
-                      <option value="High-Converting Landingpage">
-                        {language === 'de' ? 'High-Converting Landingpage' : 'High-Converting Landing Page'}
+                      <option value="Shopify Onlineshops & E-Commerce">
+                        {language === 'de' ? 'Shopify Onlineshops & E-Commerce' : 'Shopify Online Stores & E-Commerce'}
                       </option>
-                      <option value="Meta Ads (Instagram & Facebook): Erstellung & Audit">
-                        {language === 'de' ? 'Meta Ads (Instagram & Facebook): Erstellung & Audit' : 'Meta Ads (Instagram & Facebook): Campaigns & Audit'}
+                      <option value="Foto- & Videoproduktion vor Ort (NRW)">
+                        {language === 'de' ? 'Foto- & Videoproduktion vor Ort (NRW)' : 'On-Site Photo & Video Production (NRW)'}
                       </option>
-                      <option value="Social Media Audit & Content-Plan (Instagram & TikTok)">
-                        {language === 'de' ? 'Social Media Audit & Content-Plan (Instagram & TikTok)' : 'Social Media Audit & Content Plan (Instagram & TikTok)'}
+                      <option value="Google & Meta Ads: Lokale Kundengewinnung">
+                        {language === 'de' ? 'Google & Meta Ads: Lokale Kundengewinnung' : 'Google & Meta Ads: Local Customer Acquisition'}
                       </option>
-                      <option value="Strategische Analyse (SWOT, PESTEL & Lebenszyklus)">
-                        {language === 'de' ? 'Strategische Analyse (SWOT, PESTEL & Lebenszyklus)' : 'Strategic Analysis (SWOT, PESTEL & Lifecycle)'}
+                      <option value="Social Media Strategie & 30-Tage-Plan">
+                        {language === 'de' ? 'Social Media Strategie & 30-Tage-Plan (450 €)' : 'Social Media Strategy & 30-Day Plan (€450)'}
                       </option>
-                      <option value="Google AI Studio & CRM-Automatisierung">
-                        {language === 'de' ? 'Google AI Studio & CRM-Automatisierung' : 'Google AI Studio & CRM Automation'}
+                      <option value="Web-Start Landingpage">
+                        {language === 'de' ? 'Paket: Web-Start Landingpage (500 €)' : 'Package: Web-Start Landing Page (€500)'}
                       </option>
-                      <option value="Komplettpaket (Shop + Meta Ads + CRM)">
-                        {language === 'de' ? 'Komplettpaket (Shop + Meta Ads + CRM)' : 'Full Scale Package (Shop + Meta Ads + CRM)'}
+                      <option value="Website + Google Ads Start">
+                        {language === 'de' ? 'Paket: Website + Google Ads Start (750 €)' : 'Package: Website + Google Ads Start (€750)'}
                       </option>
+                      <option value="Shopify Onlineshop">
+                        {language === 'de' ? 'Paket: Shopify Onlineshop (ab 950 €)' : 'Package: Shopify Online Store (from €950)'}
+                      </option>
+                      <option value="Foto- & Videoshooting im Betrieb">
+                        {language === 'de' ? 'Add-on: Foto- & Videoshooting im Betrieb (350 €)' : 'Add-on: On-Site Photo & Video Shoot (€350)'}
+                      </option>
+                      {![
+                        'High-Converting Websites & Landingpages',
+                        'Shopify Onlineshops & E-Commerce',
+                        'Foto- & Videoproduktion vor Ort (NRW)',
+                        'Google & Meta Ads: Lokale Kundengewinnung',
+                        'Social Media Strategie & 30-Tage-Plan',
+                        'Web-Start Landingpage',
+                        'Website + Google Ads Start',
+                        'Shopify Onlineshop',
+                        'Foto- & Videoshooting im Betrieb',
+                      ].includes(formData.service) && (
+                        <option value={formData.service}>{formData.service}</option>
+                      )}
                     </select>
                   </div>
 

@@ -13,7 +13,6 @@ import { FaqSection } from './components/FaqSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 import { PagePreloader } from './components/PagePreloader';
-import { PortalModal } from './components/PortalModal';
 import { AdminBar } from './components/AdminBar';
 import { AdminModal } from './components/AdminModal';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -45,9 +44,8 @@ const SectionReveal: React.FC<SectionRevealProps> = ({ children, id, delay = 0 }
 
 function MainApplication() {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [portalOpen, setPortalOpen] = useState(false);
   const { language } = useLanguage();
-  const [contactService, setContactService] = useState<string>('Shopify Onlineshop (Neubau oder Relaunch)');
+  const [contactService, setContactService] = useState<string>('High-Converting Websites & Landingpages');
   const [contactMessage, setContactMessage] = useState<string>('');
 
   const scrollToContact = () => {
@@ -104,10 +102,7 @@ function MainApplication() {
       <AdminBar />
 
       {/* Top Navbar with Language Switcher */}
-      <Navbar
-        onOpenContact={scrollToContact}
-        onOpenPortal={() => setPortalOpen(true)}
-      />
+      <Navbar onOpenContact={scrollToContact} />
 
       {/* Main Content Area: Smooth entrance after preloader finishes */}
       <motion.main
@@ -166,13 +161,6 @@ function MainApplication() {
 
       {/* Footer */}
       <Footer />
-
-      {/* Client & Agency Firebase Portal Modal */}
-      <PortalModal
-        isOpen={portalOpen}
-        onClose={() => setPortalOpen(false)}
-        onNewInquiry={scrollToContact}
-      />
 
       {/* Admin Auth & Leads Management Modal (#admin) */}
       <AdminModal />

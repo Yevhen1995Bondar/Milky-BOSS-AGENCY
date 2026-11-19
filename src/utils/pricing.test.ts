@@ -14,39 +14,39 @@ test('calculateProjectEstimate computes baseline landingpage correctly', () => {
     adsManagement: false,
   });
 
-  assert.equal(result.basePrice, 1850);
+  assert.equal(result.basePrice, 500);
   assert.equal(result.addOnPrice, 0);
-  assert.equal(result.totalOneTime, 1850);
+  assert.equal(result.totalOneTime, 500);
   assert.equal(result.monthlyRetainer, 0);
-  assert.equal(result.estimatedWeeks, 2);
+  assert.equal(result.estimatedWeeks, 1);
 });
 
-test('calculateProjectEstimate calculates Shopify with CRM and Google AI add-ons', () => {
+test('calculateProjectEstimate calculates Shopify with photo/video and social strategy add-ons', () => {
   const result = calculateProjectEstimate({
     serviceType: 'shopify',
-    additionalFeatures: ['crm_integration', 'google_ai_automation'],
+    additionalFeatures: ['photo_video_nrw', 'social_strategy_plan'],
     maintenanceRetainer: true,
     adsManagement: true,
   });
 
-  assert.equal(result.basePrice, 3900);
-  assert.equal(result.addOnPrice, 800 + 950);
-  assert.equal(result.totalOneTime, 3900 + 1750);
-  assert.equal(result.monthlyRetainer, 390 + 850);
-  assert.equal(result.estimatedWeeks, 3);
+  assert.equal(result.basePrice, 950);
+  assert.equal(result.addOnPrice, 350 + 450);
+  assert.equal(result.totalOneTime, 950 + 800);
+  assert.equal(result.monthlyRetainer, 90 + 250);
+  assert.equal(result.estimatedWeeks, 2);
 });
 
-test('calculateProjectEstimate calculates Meta Ads, Social Audit and SWOT analysis add-ons', () => {
+test('calculateProjectEstimate calculates Website + Google Ads Start with Meta Ads and CRM add-ons', () => {
   const result = calculateProjectEstimate({
-    serviceType: 'landingpage',
-    additionalFeatures: ['meta_ads_setup', 'social_audit_content', 'strategic_swot_pestel'],
+    serviceType: 'website_ads',
+    additionalFeatures: ['meta_ads_setup', 'crm_integration'],
     maintenanceRetainer: false,
     adsManagement: false,
   });
 
-  assert.equal(result.basePrice, 1850);
-  assert.equal(result.addOnPrice, 750 + 650 + 700);
-  assert.equal(result.totalOneTime, 1850 + 2100);
+  assert.equal(result.basePrice, 750);
+  assert.equal(result.addOnPrice, 350 + 290);
+  assert.equal(result.totalOneTime, 750 + 640);
 });
 
 test('calculateConversionUplift accurately calculates revenue growth and uplift', () => {
@@ -90,7 +90,7 @@ test('validateContactForm checks required fields correctly', () => {
 });
 
 test('translations dictionary has matching top-level and nested keys for DE and EN', async () => {
-  const { TRANSLATIONS, SERVICES_I18N, PRICING_PLANS_I18N } = await import('../data/translations');
+  const { TRANSLATIONS, SERVICES_I18N, PRICING_PLANS_I18N, ADDON_SERVICES_I18N } = await import('../data/translations');
 
   const deSections = Object.keys(TRANSLATIONS.de);
   const enSections = Object.keys(TRANSLATIONS.en);
@@ -102,15 +102,24 @@ test('translations dictionary has matching top-level and nested keys for DE and 
     assert.deepEqual(deKeys.sort(), enKeys.sort(), `Section ${sec} keys do not match between DE and EN`);
   }
 
+  assert.equal(SERVICES_I18N.de.length, 5);
   assert.equal(SERVICES_I18N.de.length, SERVICES_I18N.en.length);
   assert.deepEqual(
     SERVICES_I18N.de.map((s) => s.id),
     SERVICES_I18N.en.map((s) => s.id)
   );
 
+  assert.equal(PRICING_PLANS_I18N.de.length, 3);
   assert.equal(PRICING_PLANS_I18N.de.length, PRICING_PLANS_I18N.en.length);
   assert.deepEqual(
     PRICING_PLANS_I18N.de.map((p) => p.id),
     PRICING_PLANS_I18N.en.map((p) => p.id)
+  );
+
+  assert.equal(ADDON_SERVICES_I18N.de.length, 2);
+  assert.equal(ADDON_SERVICES_I18N.de.length, ADDON_SERVICES_I18N.en.length);
+  assert.deepEqual(
+    ADDON_SERVICES_I18N.de.map((a) => a.id),
+    ADDON_SERVICES_I18N.en.map((a) => a.id)
   );
 });
